@@ -1,6 +1,6 @@
 #The Main File for the app
 import sys
-
+from http.client import CannotSendHeader
 
 from PyQt6.QtCore import Qt, QPoint, QSize
 from PyQt6.QtGui import (
@@ -14,13 +14,13 @@ from PyQt6.QtWidgets import (
     QStyle,
     QColorDialog
 )
-from PainterWidget import PainterWidget
+from Canvas import Canvas
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.canvas=PainterWidget()
+        self.canvas=Canvas()
         #setting up the menu bars and system actions
         self.bar=self.addToolBar("Menu")
         self.Color1 = QColor()
