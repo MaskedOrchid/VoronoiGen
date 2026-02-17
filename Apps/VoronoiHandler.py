@@ -37,7 +37,7 @@ class VoronoiHandler:
         self.Polys=[] #this would be a poly class list
         self.Sites=[] #this would be sites in Shapely Point form
         self.Tolerance = 0.0
-        
+
     def AddSite(self,NewSite):
         #this function will add a point and regenerate the voronoi
         self.Sites.append(Point(NewSite[0],NewSite[1]))
