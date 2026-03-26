@@ -10,6 +10,7 @@ from PySide6.QtCore import Qt
 
 import sys
 import VTestUI
+import CreationView
 
 class SubWindow(QWidget):
     def __init__(self):
@@ -22,7 +23,6 @@ class MyMainWindow(QMainWindow):
         super().__init__()
 
         self.mainWindow = par
-        self.dialog = QFileDialog()
 
         self.setWindowTitle("Create a New Project")
         self.setFixedSize(800,450)

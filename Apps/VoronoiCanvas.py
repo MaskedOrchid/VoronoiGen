@@ -4,13 +4,13 @@ from PySide6.QtWidgets import QWidget
 
 
 class VoronoiCanvas(QWidget):
-    def __init__(self, voronoi_handler):
+    def __init__(self, voronoi_handler, dimX, dimY):
         super().__init__()
 
         self.handler = voronoi_handler
         self.voro = self.handler
 
-        self.Dimensions = [500, 500]
+        self.Dimensions = [dimX, dimY]
         self.CanvasSize = QSize(self.Dimensions[0], self.Dimensions[1])
 
         self.setFixedSize(self.CanvasSize)

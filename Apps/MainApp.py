@@ -12,15 +12,15 @@ from LabelView import LabelView
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, cx, cy, title):
         super().__init__()
 
-        self.setWindowTitle("VoronoiGen")
+        self.setWindowTitle(title)
         self.setMinimumSize(1200, 700)
 
         self.handler = VoronoiHandler()
 
-        self.canvas = VoronoiCanvas(self.handler)
+        self.canvas = VoronoiCanvas(self.handler, cx, cy)
         self.handler.setCanvas(self.canvas)
 
         self.label_view = LabelView()
@@ -104,6 +104,6 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = MainWindow()
+    window = MainWindow(500,500)
     window.show()
     sys.exit(app.exec())

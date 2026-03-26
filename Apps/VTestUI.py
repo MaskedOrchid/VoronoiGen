@@ -2,7 +2,7 @@ import pandas as pd
 from PySide6.QtWidgets import (QApplication, QMainWindow,
                                QPushButton, QVBoxLayout,
                                QWidget, QLabel, QSpacerItem,
-                                QLayout
+                                QLayout, QDialog
                                )
 
 from PySide6.QtGui import (QImage,QPalette,QBrush,QPixmap,QIcon,QFontDatabase, QFont)
@@ -12,6 +12,8 @@ from PySide6.QtCore import QSize, Qt
 import sys
 import os
 import Parser
+import CreationView
+import MainApp
 
 
 class MainWindow(QMainWindow):
@@ -82,9 +84,12 @@ class MainWindow(QMainWindow):
 
         self.button3.setFixedSize(300, 70)
 
+        base_dir = os.path.dirname(__file__)
+        image_path = os.path.join(base_dir, "Images", "Button1.png")
+        image_path = image_path.replace("\\", "/")
         # TO DO: figure out how to call this shit without needing the absolute directory
         self.button3.setStyleSheet(f"""
-                                QPushButton {{ border-image: url(C:/Users/ciphe/Cloned Projects/VoronoiGen/Apps/Images/Button1.png);
+                                QPushButton {{ border-image: url({image_path});
                                     background-color: transparent;
                                     font-family: {font_family_name};
                                     font-size: 16pt; 
@@ -107,8 +112,12 @@ class MainWindow(QMainWindow):
 
         self.button2.setFixedSize(QSize(160, 40))
 
+        base_dir = os.path.dirname(__file__)
+        image_path = os.path.join(base_dir, "Images", "Button2.png")
+        image_path = image_path.replace("\\", "/")
+
         self.button2.setStyleSheet(f"""
-                                QPushButton {{ border-image: url(C:/Users/ciphe/Cloned Projects/VoronoiGen/Apps/Images/Button2.png);
+                                QPushButton {{ border-image: url({image_path});
                                     background-color: transparent;
                                     font-family: {font_family_name};
                                     font-size: 14pt; 
@@ -137,12 +146,44 @@ class MainWindow(QMainWindow):
 
 
     def open_dialog(self, checked):
-        self.childWindow.show()
-        self.childWindow.mainWindow = self
+        #self.childWindow.show()
+       # self.childWindow.mainWindow = self
+        dialog = CreationDialog(self)
+        dialog.exec()
+
     def open_dialog2(self, checked):
-        self.childWindow.show()
+       # self.childWindow.show()
+       dialog = CreationDialog(self)
+       dialog.exec()
+
     def exit_app(self):
         self.close()
+
+class CreationDialog(QDialog):
+    def __init__(self, mainwindow):
+        super().__init__()
+        self.mainWin = mainwindow
+        self.ui = CreationView.Ui_CreationView()
+        self.ui.setupUi(self)
+
+        self.name = ""
+        self.width = 0
+        self.height = 0
+        self.mainApp = ()
+
+    def accept(self):
+
+        self.name = self.ui.lineEdit.text()
+        try:
+            self.width = int(self.ui.lineEdit_9.text())
+            self.height = int(self.ui.lineEdit_2.text())
+        except ValueError:
+            print("Width and height must be numbers!")
+            return
+        mainapp = MainApp.MainWindow(self.width, self.height, self.name)
+        mainapp.show()
+        self.mainWin.close()
+        super().accept()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
