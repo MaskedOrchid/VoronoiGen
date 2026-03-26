@@ -1,23 +1,24 @@
 # Imports
 from PySide6.QtGui import QColor
-from VoronoiHandler import Poly
 
 
-# Label Class:
 class Label:
-
     def __init__(self, name="", color=QColor(255, 255, 255)):
         self.Name = name
         self.FillColor = color
         self.SiteColor = QColor(0, 0, 0)
-        self.Sites = []  # List of Sites
-        self.Polys = []  # list of polygons
 
-    def setFillColor(self, C):
-        self.FillColor = C
+        self.Sites = []   # list of sites
+        self.Polys = []   # list of polygons
 
-    def setSiteColor(self, S):
-        self.SiteColor = S
+    # -------------------------
+    # COLOR METHODS
+    # -------------------------
+    def setFillColor(self, color):
+        self.FillColor = color
+
+    def setSiteColor(self, color):
+        self.SiteColor = color
 
     def getFillColor(self):
         return self.FillColor
@@ -25,24 +26,33 @@ class Label:
     def getSiteColor(self):
         return self.SiteColor
 
+    # -------------------------
+    # NAME
+    # -------------------------
     def getName(self):
         return self.Name
 
-    def addSite(self, S):
-        if S not in self.Sites:  # Prevent duplicates
-            self.Sites.append(S)
+    # -------------------------
+    # RELATIONS
+    # -------------------------
+    def addSite(self, site):
+        if site not in self.Sites:
+            self.Sites.append(site)
 
-    def addPoly(self, P):
-        if P not in self.Polys:  # Prevent duplicates
-            self.Polys.append(P)
+    def addPoly(self, poly):
+        if poly not in self.Polys:
+            self.Polys.append(poly)
 
-    def removeSite(self, S):
-        if S in self.Sites:
-            self.Sites.remove(S)
+    def removeSite(self, site):
+        if site in self.Sites:
+            self.Sites.remove(site)
 
-    def removePoly(self, P):
-        if P in self.Polys:
-            self.Polys.remove(P)
+    def removePoly(self, poly):
+        if poly in self.Polys:
+            self.Polys.remove(poly)
 
+    # -------------------------
+    # STRING
+    # -------------------------
     def __str__(self):
         return self.Name
