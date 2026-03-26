@@ -1,4 +1,3 @@
-# Imports
 from PySide6.QtGui import QColor
 
 
@@ -7,13 +6,9 @@ class Label:
         self.Name = name
         self.FillColor = color
         self.SiteColor = QColor(0, 0, 0)
+        self.Sites = []
+        self.Polys = []
 
-        self.Sites = []   # list of sites
-        self.Polys = []   # list of polygons
-
-    # -------------------------
-    # COLOR METHODS
-    # -------------------------
     def setFillColor(self, color):
         self.FillColor = color
 
@@ -26,15 +21,9 @@ class Label:
     def getSiteColor(self):
         return self.SiteColor
 
-    # -------------------------
-    # NAME
-    # -------------------------
     def getName(self):
         return self.Name
 
-    # -------------------------
-    # RELATIONS
-    # -------------------------
     def addSite(self, site):
         if site not in self.Sites:
             self.Sites.append(site)
@@ -51,8 +40,5 @@ class Label:
         if poly in self.Polys:
             self.Polys.remove(poly)
 
-    # -------------------------
-    # STRING
-    # -------------------------
     def __str__(self):
         return self.Name

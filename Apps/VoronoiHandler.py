@@ -57,7 +57,6 @@ class SiteData:
         new_point = Point(NewSite[0], NewSite[1])
         if new_point in self.Sites:
             return False
-
         self.Sites.append(new_point)
         return True
 
@@ -76,7 +75,7 @@ class SiteData:
         self.Polys.clear()
 
     def AddPoly(self, S, P):
-        self.Polys.append(Poly(S, P, QColor(255, 255, 255), QColor(255, 0, 0)))
+        self.Polys.append(Poly(S, P, QColor(235, 235, 235), QColor(255, 0, 0)))
 
     def GetPolys(self):
         return self.Polys
@@ -103,13 +102,13 @@ class VoronoiHandler:
         self.SitesEnabled = True
         self.LinesEnabled = True
         self.LineColor = QColor(0, 0, 0)
-        self.LineThickness = 10
+        self.LineThickness = 3
 
         self.area = None
+        self.label_model = None
 
     def setCanvas(self, canvas):
         self.can = canvas
-
         cansize = self.can.GetCanvasSize()
         self.area = MultiPoint([
             [0, 0],
@@ -117,7 +116,6 @@ class VoronoiHandler:
             [cansize[0], cansize[1]],
             [0, cansize[1]]
         ])
-
         self.can.SetLineThickness(self.LineThickness)
 
     @property
@@ -172,6 +170,23 @@ class VoronoiHandler:
             self.data.AddPoly(site, polygon)
             i += 1
 
+    def assignLabelToCell(self, pos):
+        if self.label_model is None:
+            return
+
+        selected_label = self.label_model.get_selected_label()
+        if selected_label is None:
+            return
+
+        pt = QPointF(pos[0], pos[1])
+
+        for poly in self.data.GetPolys():
+            if poly.GetPolygon().containsPoint(pt, Qt.FillRule.OddEvenFill):
+                poly.setFillColor(QColor(selected_label.getFillColor()))
+                break
+
+        self.UpdateCanvas()
+
     def UpdateDiagram(self, Pos):
         if self.mode == DrawModes.Add:
             if self.AddSite(Pos):
@@ -188,7 +203,7 @@ class VoronoiHandler:
                 if len(self.data.GetSites()) <= 0 and self.can:
                     self.clearCanvas()
 
-        else:
+        elif self.mode == DrawModes.Select:
             self.assignLabelToCell(Pos)
 
     def UpdateCanvas(self):
@@ -245,22 +260,3 @@ class VoronoiHandler:
         self.LineThickness = T
         if self.can:
             self.can.SetLineThickness(T)
-
-    def assignLabelToCell(self, pos):
-        if not hasattr(self, "label_model") or self.label_model is None:
-            return
-
-        selected_label = self.label_model.get_selected_label()
-        if selected_label is None:
-            return
-
-        from PySide6.QtCore import QPointF, Qt
-
-        pt = QPointF(pos[0], pos[1])
-
-        for poly in self.data.GetPolys():
-            if poly.GetPolygon().containsPoint(pt, Qt.FillRule.OddEvenFill):
-                poly.setFillColor(selected_label.color)
-                break
-
-        self.UpdateCanvas()

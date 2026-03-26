@@ -36,7 +36,7 @@ class VoronoiCanvas(QWidget):
 
             painter.setPen(self.Pen)
             painter.setBrush(self.Brush)
-            painter.drawEllipse(QPointF(sitepoint.x, sitepoint.y), 4, 4)
+            painter.drawEllipse(QPointF(sitepoint.x, sitepoint.y), 3, 3)
 
         painter.end()
         self.update()

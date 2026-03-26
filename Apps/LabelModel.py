@@ -4,20 +4,16 @@ from Label import Label
 
 
 class LabelModel(QObject):
-    # Signals for UI updates
     label_added = Signal(object)
     label_removed = Signal(object)
     label_updated = Signal(object)
+    selection_changed = Signal(object)
 
     def __init__(self):
         super().__init__()
-
         self.labels = []
-        self.selected_label = None  # 🔥 IMPORTANT
+        self.selected_label = None
 
-    # -------------------------
-    # LABEL MANAGEMENT
-    # -------------------------
     def add_label(self, name):
         new_label = Label(name, QColor(200, 200, 255))
         self.labels.append(new_label)
@@ -25,6 +21,9 @@ class LabelModel(QObject):
 
     def remove_label_by_object(self, label):
         if label in self.labels:
+            if self.selected_label == label:
+                self.selected_label = None
+                self.selection_changed.emit(None)
             self.labels.remove(label)
             self.label_removed.emit(label)
             return True
@@ -44,20 +43,15 @@ class LabelModel(QObject):
                 self.label_updated.emit(label)
                 return
 
-    # -------------------------
-    # GETTERS
-    # -------------------------
     def get_all_labels(self):
         return self.labels
 
     def get_label_count(self):
         return len(self.labels)
 
-    # -------------------------
-    # 🔥 SELECTION (CRITICAL)
-    # -------------------------
     def set_selected_label(self, label):
         self.selected_label = label
+        self.selection_changed.emit(label)
 
     def get_selected_label(self):
         return self.selected_label
