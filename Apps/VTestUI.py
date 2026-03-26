@@ -62,9 +62,13 @@ class MainWindow(QMainWindow):
 
         self.button.setFixedSize(300, 70)
 
+        base_dir = os.path.dirname(__file__)
+        image_path = os.path.join(base_dir, "Images", "Button1.png")
+        image_path = image_path.replace("\\", "/")
+
         # TO DO: figure out how to call this shit without needing the absolute directory
         self.button.setStyleSheet(f"""
-                                QPushButton {{ border-image: url(C:/Users/ciphe/Cloned Projects/VoronoiGen/Apps/Images/Button1.png);
+                                QPushButton {{ border-image: url({image_path});
                                     background-color: transparent;
                                     font-family: {font_family_name};
                                     font-size: 16pt; 
@@ -84,9 +88,6 @@ class MainWindow(QMainWindow):
 
         self.button3.setFixedSize(300, 70)
 
-        base_dir = os.path.dirname(__file__)
-        image_path = os.path.join(base_dir, "Images", "Button1.png")
-        image_path = image_path.replace("\\", "/")
         # TO DO: figure out how to call this shit without needing the absolute directory
         self.button3.setStyleSheet(f"""
                                 QPushButton {{ border-image: url({image_path});
