@@ -5,9 +5,9 @@ from PySide6.QtWidgets import (QApplication, QMainWindow,
                                 QLayout, QDialog
                                )
 
-from PySide6.QtGui import (QImage,QPalette,QBrush,QPixmap,QIcon,QFontDatabase, QFont)
+from PySide6.QtGui import (QImage,QPalette,QBrush,QPixmap,QIcon,QFontDatabase, QFont, QAction)
 
-from PySide6.QtCore import QSize, Qt
+from PySide6.QtCore import QSize, Qt, QCoreApplication
 
 import sys
 import os
@@ -142,6 +142,7 @@ class MainWindow(QMainWindow):
         self.layout.setContentsMargins(50, 0, 0, 0)
         self.layout.setSpacing(20)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+
 
         self.central_widget.setLayout(self.layout)
 

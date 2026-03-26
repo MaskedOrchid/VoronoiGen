@@ -1,10 +1,12 @@
 import sys
+
+from PySide6.QtGui import QAction
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget,
     QHBoxLayout, QVBoxLayout, QPushButton,
     QLabel, QScrollArea
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QCoreApplication
 
 from VoronoiHandler import VoronoiHandler, DrawModes
 from VoronoiCanvas import VoronoiCanvas
@@ -97,13 +99,94 @@ class MainWindow(QMainWindow):
         main_layout.addLayout(content_layout)
         main_layout.addStretch(1)
 
+        # adding the new action
+        new_action = QAction("New Project", self)
+        new_action.setStatusTip("This creates a new Project")
+        new_action.triggered.connect(self.New)
+        # adding the Open action
+        open_action = QAction("Open Project", self)
+        open_action.setStatusTip("This Opens a Project")
+        open_action.triggered.connect(self.Open)
+        # adding the Export action
+        save_action = QAction("Save Project", self)
+        save_action.setStatusTip("This saves the current Project")
+        save_action.triggered.connect(self.Save)
+        # adding the Export action
+        export_action = QAction("Export Diagram", self)
+        export_action.setStatusTip("This exports the Voronoi Diagram as an image")
+        export_action.triggered.connect(self.Export)
+        # adding the Quit action
+        quit_action = QAction("Quit", self)
+        quit_action.setStatusTip("Closes Program")
+        quit_action.triggered.connect(QCoreApplication.quit)
+
+        self.menu = self.menuBar()
+        file_menu = self.menu.addMenu("&File")
+        file_menu.addAction(new_action)
+        file_menu.addAction(open_action)
+        file_menu.addAction(save_action)
+        file_menu.addAction(export_action)
+        file_menu.addAction(quit_action)
+
+        # Voronoi_menus
+        Line_menu = self.menu.addMenu("&Line Options")
+        # adding the Line toggle on action
+        lineOn_action = QAction("Toggle lines on", self)
+        lineOn_action.triggered.connect(self.ToggleLinesOn)
+        # adding the Line toggle on action
+        lineOff_action = QAction("Toggle lines off", self)
+        lineOff_action.triggered.connect(self.ToggleLinesOff)
+        Line_menu.addActions([lineOn_action, lineOff_action])
+
+        Site_menu = self.menu.addMenu("&Site Options")
+        # adding the Line toggle on action
+        siteOn_action = QAction("Toggle sites on", self)
+        siteOn_action.triggered.connect(self.ToggleSitesOn)
+        # adding the Line toggle on action
+        siteOff_action = QAction("Toggle sites off", self)
+        siteOff_action.triggered.connect(self.ToggleSitesOff)
+        Site_menu.addActions([siteOn_action, siteOff_action])
+
+
         central = QWidget()
         central.setLayout(main_layout)
         self.setCentralWidget(central)
 
+#This need to be the toolbar widget--> Needs to be refactored
+    def ToggleAdd(self):
+        self.handler.setMode(DrawModes.Add)
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = MainWindow(500,500)
-    window.show()
-    sys.exit(app.exec())
+    def ToggleRemove(self):
+        self.handler.setMode(DrawModes.Remove)
+
+    #toolbar functions --> Need to be refactored
+    def Save(self):
+        #this function will save the project
+        print("Saving Project")
+
+    def Export(self):
+        #this function will export the voronoi diagram as an image
+        print("Exporting Voronoi Diagram")
+
+    def Open(self):
+        #this function will open a project
+        print("Open Project")
+        self.Parser.show()
+
+    def New(self):
+        #this function will create a new project
+        print("Create new Project")
+
+    def ToggleLinesOn(self):
+        self.handler.toggleLines(True)
+
+    def ToggleLinesOff(self):
+        self.handler.toggleLines(False)
+
+    def ToggleSitesOn(self):
+        self.handler.toggleSites(True)
+
+    def ToggleSitesOff(self):
+        self.handler.toggleSites(False)
+
+
