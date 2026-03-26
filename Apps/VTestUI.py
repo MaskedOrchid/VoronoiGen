@@ -136,7 +136,6 @@ class MainWindow(QMainWindow):
         self.central_widget.setLayout(self.layout)
 
 
-
     def open_dialog(self, checked):
         self.childWindow.show()
         self.childWindow.mainWindow = self

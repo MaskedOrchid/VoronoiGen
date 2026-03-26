@@ -12,14 +12,14 @@ from shapely.creation import geometrycollections
 from VoronoiCanvas import VoronoiCanvas
 
 
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.voro=VoronoiHandler()
-        self.isadding=True
-        self.can=self.voro.GetCanvas
-        self.setCentralWidget(self.can)
-
+# class MainWindow(QMainWindow):
+#     def __init__(self):
+#         super().__init__()
+#         self.voro=VoronoiHandler()
+#         self.isadding=True
+#         self.can=self.voro.GetCanvas
+#         self.setCentralWidget(self.can)
+#
 
 #The Poly Class
 class Poly:
@@ -44,6 +44,16 @@ class Poly:
         self.polygon=P
     def SetSite(self, S):
         self.Site=S
+    def __eq__(self, other):
+        #overrding the == operator
+        if isinstance(other, Poly):
+            #assumes that sites are unique
+            return other.Site==self.Site
+        return False
+
+    def __ne__(self, other):
+        #overriding the ne operator because I have too :(
+        return not self.__eq__(other)
 
 #The SiteData Class
 class SiteData:
@@ -81,6 +91,16 @@ class SiteData:
     def GetSites(self):
         return self.Sites
 
+    def HasSite(self,NewSite):
+        if NewSite in self.Sites:
+            return True
+        return False
+
+    def HasPoly(self,NewPoly):
+        if NewPoly in self.Polys:
+            return True
+        return False
+
 class DrawModes(Enum):
     Select=1
     Add=2
@@ -93,7 +113,7 @@ class VoronoiHandler:
     def __init__(self):
         self.Voro=geometrycollections([])
         self.data=SiteData()
-        self.Tolerance = 0.0
+        self.Tolerance = 0.001
 
         #Drawing Stuff
         self.can=VoronoiCanvas()
@@ -103,21 +123,26 @@ class VoronoiHandler:
         self.SitesEnabled = True
         self.LinesEnabled = True
         self.LineColor=QColor(0, 0, 0)
+        self.LineThickness=10
+        self.SetLineThickness(self.LineThickness)
 
         #setting up bounds
         cansize=self.can.GetCanvasSize()
         self.area=MultiPoint([[0,0],[cansize[0],0],
                              cansize,[0,cansize[1]]])
 
-        #for testing
-
-        for i in range(0,10,1):
-            newpos=[random.randrange(100,400),random.randrange(100,400)]
+    def GenerateRandomPoints(self,N):
+        #This function generates random site points within the bounds of the voronoi
+        size=self.can.GetCanvasSize()
+        for i in range(0,N,1):
+            newpos=[random.randrange(10,size[0]-10),random.randrange(10,size[1]-10)]
             self.UpdateDiagram(newpos)
-        self.mode = DrawModes.Remove
 
     def AddSite(self,NewSite):
         #this function will add a new site to the data and regenerate the voronoi
+        if self.data.HasSite(NewSite):
+            print("Error: Duplicate Sites")
+            return False
         return self.data.AddSite(NewSite)
 
     def RemoveSite(self,Pos):
@@ -127,19 +152,19 @@ class VoronoiHandler:
     def RegenerateVoronoi(self):
         #this function will generate a voronoi from a list of sites
         sites=self.data.GetSites()
-        if len(sites)>0:
-            tempMulti = MultiPoint(sites)
-            #this will generate a voronoi diagram
-            self.Voro = voronoi_polygons(tempMulti,tolerance=self.Tolerance,extend_to=self.area,only_edges=False,ordered=True)
+        tempMulti = MultiPoint(sites)
+        #this will generate a voronoi diagram
+        self.Voro = voronoi_polygons(tempMulti,tolerance=self.Tolerance,extend_to=self.area,only_edges=False,ordered=True)
 
     def UpdatePolys(self):
         #need to somehow update the label class--> maybe tell Label that things changed
         #assumes that SiteData as Polygons and Sites have the same Indices
         sites = self.data.GetSites()
-        if len(sites) <=0:
+        if len(sites) <0:
             # if we do not have the minimum number of points in order to generate the voronoi
             print("Error: Minimum Site amount not met")
             return
+
         self.data.ClearPolys()
         i=0
         for p in self.Voro.geoms:
@@ -169,6 +194,9 @@ class VoronoiHandler:
                 self.RegenerateVoronoi()
                 self.UpdatePolys()
                 self.UpdateCanvas()
+            else:
+                if len(self.data.GetSites())<=0:
+                    self.clearCanvas()
         else:
             print("Selecting the closest Cell")
             return
@@ -185,13 +213,16 @@ class VoronoiHandler:
     def toggleLines(self,L):
         # Sets whether the Lines are enabled
         self.LinesEnabled=L
+        self.UpdateCanvas()
 
     def toggleSites(self,S):
         #Sets whether the sites are enabled
         self.SitesEnabled = S
+        self.UpdateCanvas()
 
     def SetLineColor(self, C):
         self.LineColor=C
+        self.UpdateCanvas()
 
     def GetMode(self):
         return self.mode
@@ -211,10 +242,12 @@ class VoronoiHandler:
     def AddLabel(self):
         #does label stuff
         return
+    def clearCanvas(self):
+        self.can.ClearCanvas()
 
+    def GetLineThickness(self):
+        return self.LineThickness
 
-#this starts up the process to open and run the main window object
-app = QApplication(sys.argv)
-w = MainWindow()
-w.show()
-app.exec()
+    def SetLineThickness(self,T):
+        self.LineThickness=T
+        self.can.SetLineThickness(T)

@@ -24,12 +24,14 @@ class VoronoiCanvas(QWidget):
         self.BGImage=""
         self.Painter = QPainter()
         self.Pen = QPen()
+        self.Pen.setCapStyle(Qt.RoundCap)
+        self.Pen.setJoinStyle(Qt.RoundJoin)
         self.Brush = QBrush(Qt.SolidPattern)
         self.Image.fill(Qt.white)
-        self.LineThinkness=10
 
     def GiveVoronoiDiagram(self, V):
         self.voro=V
+
 
     def renderSites(self):
         #this renders the sites only
@@ -41,12 +43,9 @@ class VoronoiCanvas(QWidget):
             #setting up the Pen
             sitepoint=p.GetSite()
             self.Brush.setColor(p.getSiteColor())
-            self.Pen.setWidthF(self.LineThinkness)
             self.Pen.setColor(p.getSiteColor())
             painter.setPen(self.Pen)
             painter.setBrush(self.Brush)
-
-            print(p.getSiteColor())
 
             #calling the draw event
             painter.drawPoint(QPointF(sitepoint.x,sitepoint.y))
@@ -105,3 +104,12 @@ class VoronoiCanvas(QWidget):
         newpoint = [pos.x(), pos.y()]
 
         self.voro.UpdateDiagram(newpoint)
+
+    def ClearCanvas(self):
+        #this need to be fixed to just clear the canvas and not regenerate a few image
+        self.Image = QImage(self.CanvasSize, QImage.Format.Format_ARGB32)
+        self.Image.fill(Qt.white)
+        self.update()
+
+    def SetLineThickness(self,T):
+        self.Pen.setWidthF(T)
