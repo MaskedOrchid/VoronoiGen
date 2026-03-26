@@ -116,20 +116,14 @@ class VoronoiHandler:
         self.Tolerance = 0.001
 
         #Drawing Stuff
-        self.can=VoronoiCanvas()
-        self.can.GiveVoronoiDiagram(self)
+        self.can = None  # will be set externally
         self.mode=DrawModes.Add
 
         self.SitesEnabled = True
         self.LinesEnabled = True
         self.LineColor=QColor(0, 0, 0)
         self.LineThickness=10
-        self.SetLineThickness(self.LineThickness)
 
-        #setting up bounds
-        cansize=self.can.GetCanvasSize()
-        self.area=MultiPoint([[0,0],[cansize[0],0],
-                             cansize,[0,cansize[1]]])
 
     def GenerateRandomPoints(self,N):
         #This function generates random site points within the bounds of the voronoi
@@ -248,6 +242,25 @@ class VoronoiHandler:
     def GetLineThickness(self):
         return self.LineThickness
 
-    def SetLineThickness(self,T):
-        self.LineThickness=T
-        self.can.SetLineThickness(T)
+    def SetLineThickness(self, T):
+        self.LineThickness = T
+        if self.can:
+            self.can.SetLineThickness(T)
+    
+    def setCanvas(self, canvas):
+        self.can = canvas
+
+        # 🔥 Now it's safe to use canvas
+        cansize = self.can.GetCanvasSize()
+        self.area = MultiPoint([
+            [0, 0],
+            [cansize[0], 0],
+            [cansize[0], cansize[1]],
+            [0, cansize[1]]
+        ])
+
+        # apply line thickness now that canvas exists
+        self.can.SetLineThickness(self.LineThickness)
+
+    def GetCanvasSize(self):
+        return self.Dimensions

@@ -7,27 +7,34 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel
 
 
 class VoronoiCanvas(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.Dimensions=[500,500]
+    def __init__(self, voronoi_handler):
+        super().__init__()
+
+        self.handler = voronoi_handler
+        self.voro = self.handler  # ✅ keep this
+
+        self.Dimensions = [500, 500]
         self.CanvasSize = QSize(self.Dimensions[0], self.Dimensions[1])
 
-        #setting up voronoi related controls
+        # setting up voronoi related controls
         self.setFixedSize(self.CanvasSize)
         self.setMinimumSize(self.CanvasSize)
 
-        self.voro=None
-
-        #drawing functionality
-        #self.image is the actual image being drawn
+        # drawing functionality
         self.Image = QImage(self.CanvasSize, QImage.Format.Format_ARGB32)
-        self.BGImage=""
+        self.Image.fill(Qt.white)
+
+        self.BGImage = ""
         self.Painter = QPainter()
+
         self.Pen = QPen()
         self.Pen.setCapStyle(Qt.RoundCap)
         self.Pen.setJoinStyle(Qt.RoundJoin)
+
         self.Brush = QBrush(Qt.SolidPattern)
-        self.Image.fill(Qt.white)
+
+    def GetCanvasSize(self):
+        return self.Dimensions
 
     def GiveVoronoiDiagram(self, V):
         self.voro=V
@@ -103,7 +110,10 @@ class VoronoiCanvas(QWidget):
         # adding the point to the voronoi diagram
         newpoint = [pos.x(), pos.y()]
 
-        self.voro.UpdateDiagram(newpoint)
+        self.handler.UpdateDiagram(newpoint)  # refresh reference
+        self.renderCells()
+        self.renderSites()
+        self.update()
 
     def ClearCanvas(self):
         #this need to be fixed to just clear the canvas and not regenerate a few image
@@ -113,3 +123,4 @@ class VoronoiCanvas(QWidget):
 
     def SetLineThickness(self,T):
         self.Pen.setWidthF(T)
+
