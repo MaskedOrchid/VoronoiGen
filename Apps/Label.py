@@ -4,7 +4,7 @@ from PySide6.QtGui import QColor
 class Label:
     def __init__(self, name="", color=QColor(255, 255, 255)):
         self.Name = name
-        self.FillColor = color
+        self.FillColor = QColor(255, 255, 255)
         self.SiteColor = QColor(0, 0, 0)
         self.Sites = []
         self.Polys = []
@@ -27,6 +27,9 @@ class Label:
     def addSite(self, site):
         if site not in self.Sites:
             self.Sites.append(site)
+
+    def getSites(self):
+        return self.Sites
 
     def addPoly(self, poly):
         if poly not in self.Polys:

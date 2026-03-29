@@ -21,6 +21,7 @@ class LabelItemWidget(QWidget):
         self.init_ui()
         self.update_display()
 
+
     def init_ui(self):
         layout = QHBoxLayout()
         layout.setContentsMargins(10, 8, 10, 8)
@@ -137,6 +138,8 @@ class LabelView(QWidget):
 
         self.init_ui()
         self.refresh()
+
+
 
     def init_ui(self):
         main_layout = QVBoxLayout()
