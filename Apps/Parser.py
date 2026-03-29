@@ -1,4 +1,8 @@
-import pandas as pd
+# -=-=-=-=-=-=-=-=-= IGNORE THIS -=-=-=-=-=-=-=-=-=
+
+
+
+"""import pandas as pd
 
 from PySide6.QtWidgets import (QApplication, QMainWindow,
                                QPushButton, QVBoxLayout,
@@ -9,7 +13,7 @@ from PySide6.QtCore import Qt
 
 
 import sys
-import VTestUI
+import HomeView
 import CreationView
 
 class SubWindow(QWidget):
@@ -108,4 +112,4 @@ if __name__ == '__main__':
     app.setStyle('Fusion')
     w = MyMainWindow(0)
     w.show()
-    sys.exit(app.exec())
+    sys.exit(app.exec())"""

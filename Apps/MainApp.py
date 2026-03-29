@@ -11,23 +11,32 @@ from PySide6.QtCore import Qt, QCoreApplication
 from VoronoiController import VoronoiController
 from CanvasTools import CanvasTools
 from LabelView import LabelView
-
+from Apps.CreationModel import CreationModel
 
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, cx, cy, title):
+    def __init__(self, creationModel = None, width = 0, height = 0, name = ""):
         super().__init__()
         """
             The Main Application window.  Mostly acts as a UI, class, and layout manager
         """
-        self.setWindowTitle(title)
+
+        if(creationModel):
+            self.setWindowTitle(creationModel.getTitle())
+            self.width = creationModel.width()
+            self.height = creationModel.height()
+        else:
+            self.setWindowTitle(name)
+            self.width = width
+            self.height = height
+
         self.setMinimumSize(1200, 700)
 
         self.menu = self.menuBar()
 
         #Voronoi Controller
-        self.voroController=VoronoiController(cx,cy)
+        self.voroController=VoronoiController(self.width, self.height)
         #Label Controller
         self.label_view = LabelView()
         self.label_model = self.label_view.get_model()
@@ -40,7 +49,7 @@ class MainWindow(QMainWindow):
         #setting up UI and classes
 
         self.setUpMenuBar()
-        self.setUpVoronoi(cx,cy)
+        self.setUpVoronoi(self.width, self.height)
         self.setUpLabels()
         self.setUpParser()
         self.setUpLayouts()
@@ -144,11 +153,6 @@ class MainWindow(QMainWindow):
         #this function will export the voronoi diagram as an image
         print("Exporting Voronoi Diagram")
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    w = MainWindow(500,500,"Main")
-    w.show()
-    sys.exit(app.exec())
 
 
 

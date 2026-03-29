@@ -19,6 +19,8 @@ from PySide6.QtWidgets import (QAbstractButton, QApplication, QDialog, QDialogBu
     QHBoxLayout, QLabel, QLineEdit, QSizePolicy,
     QSpacerItem, QVBoxLayout, QWidget)
 
+import HomeController
+
 class Ui_CreationView(object):
     def setupUi(self, CreationView):
         if not CreationView.objectName():
@@ -140,4 +142,22 @@ class Ui_CreationView(object):
         self.label_9.setText(QCoreApplication.translate("CreationView", u"Canvas Width", None))
         self.label_2.setText(QCoreApplication.translate("CreationView", u"Canvas Height", None))
     # retranslateUi
+
+
+class CreationDialog(QDialog):
+    def __init__(self, controller):
+        super().__init__()
+
+        self.controller = controller
+
+        self.ui = Ui_CreationView()
+        self.ui.setupUi(self)
+
+    def accept(self):
+
+        if self.controller.alterModel(self.ui.lineEdit.text(), self.ui.lineEdit_9.text(), self.ui.lineEdit_2.text()):
+            self.controller.initializeMainApp()
+            super().accept()
+        return
+
 
