@@ -1,5 +1,6 @@
 
 # TODO: Add and implement parsed file information, background image, custom filetype, etc.
+# Model for converting data from the CreationView into the Main Application and Canvas.
 class CreationModel:
 
     def __init__(self, tt = "", cx = 0, cy = 0):

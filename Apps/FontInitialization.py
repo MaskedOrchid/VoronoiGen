@@ -2,6 +2,8 @@ import os
 
 from PySide6.QtGui import (QFontDatabase, QFont)
 
+
+# Class for initializing the custom UI fonts
 class FontInitialization:
 
     def __init__(self):

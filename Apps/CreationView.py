@@ -155,6 +155,7 @@ class CreationDialog(QDialog):
 
     def accept(self):
 
+        # Allow controller to handle input logic.
         if self.controller.alterModel(self.ui.lineEdit.text(), self.ui.lineEdit_9.text(), self.ui.lineEdit_2.text()):
             self.controller.initializeMainApp()
             super().accept()
