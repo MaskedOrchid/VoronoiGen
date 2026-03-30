@@ -98,7 +98,7 @@ class Poly:
         return False
 
     def __ne__(self, other):
-        """Check inequality of two Poly objects."""
+        """Handles the ! or not for equalities between polys"""
         return not self.__eq__(other)
 
 
@@ -133,7 +133,7 @@ class VoronoiModel:
     def removeSite(self, site):
         """Remove a site based on point coordinates.
         
-        Finds the polygon containing the point and removes its associated site.
+        Finds the polygon containing the point and removes its associated site
         
         Args:
             site: [x, y] coordinates of the point to remove
@@ -157,9 +157,9 @@ class VoronoiModel:
         
         Args:
             s: Shapely Point for the site
-            p: QPolygonF for the cell boundary
-            sc: QColor for the site
-            fc: QColor for filling the cell
+            p: QPolygonF for the cell's edges
+            sc: QColor for the site's color
+            fc: QColor for the cell's color fill
         """
         self.Polys.append(Poly(s, p, sc, fc))
 
@@ -183,7 +183,7 @@ class VoronoiModel:
         """Find the polygon containing the given point coordinates.
         
         Args:
-            site: [x, y] coordinates to search for
+            site: [x, y] coordinates to try to find the closest site point
             
         Returns:
             Poly: The polygon object containing the point, or None if not found
@@ -241,7 +241,7 @@ class VoronoiController:
         self.Voro = geometrycollections([])
         # Data model for managing sites and cells
         self.data = VoronoiModel()
-        # Tolerance for Voronoi computation
+        # Tolerance for degenerate data handling for sites being too close
         self.Tolerance = 0.001
 
         # View for rendering the diagram
@@ -253,13 +253,13 @@ class VoronoiController:
         self.SitesEnabled = True       # Show/hide site points
         self.LinesEnabled = True       # Show/hide cell borders
         self.LineColor = QColor(0, 0, 0)  # Color for cell borders (black)
-        self.LineThickness = 3         # Width of cell border lines
+        self.LineThickness = 3         # Width of cell borderlines
 
         # Define the bounding area for Voronoi computation
         self.area = MultiPoint(
             [[0, 0], [dimX, 0], [dimX, dimY], [0, dimY]]
         )
-        # Optional label model for associating labels with cells
+        # label model for associating labels with cells
         self.label_model = None
 
 
@@ -301,6 +301,8 @@ class VoronoiController:
         
         Creates random points within the canvas bounds (with 10-pixel margin)
         and adds them to the diagram.
+
+        This is a testing function.
         
         Args:
             n: Number of random sites to generate
@@ -341,7 +343,7 @@ class VoronoiController:
         Removes the site from the label model(s) and the data model.
         
         Args:
-            pos: [x, y] coordinates of the site to remove
+            pos: [x, y] coordinates of the mouse click event r
             
         Returns:
             bool: True if site was removed, False if not found
@@ -352,6 +354,7 @@ class VoronoiController:
             if rmpoly is None:
                 print("Error could not find target site to remove")
             else:
+                # Finding the closest site that will approximate which site needs to be removed
                 rmsite = self.data.findPolyContainPoint(pos).getSite()
                 self.label_model.remove_site_from_all_labels(rmsite)
 
@@ -362,7 +365,7 @@ class VoronoiController:
         """Recompute the Voronoi diagram from current sites.
         
         Uses Shapely's voronoi_polygons function to compute the diagram
-        based on the current set of sites, with result clipped to the canvas area.
+        based on the current set of sites, with result clipped to the canvas dimensions
         """
         sites = self.data.getSites()
         # Don't regenerate if no sites or no bounding area
@@ -383,7 +386,7 @@ class VoronoiController:
     def updatePolys(self):
         """Convert computed Voronoi polygons to Poly objects in the data model.
         
-        Transforms Shapely polygons to QPolygons and creates Poly objects
+        Transforms Shapely voronoi geometry into QPolygons and creates Poly objects
         with appropriate colors from the label model.
         """
         sites = self.data.getSites()
@@ -438,7 +441,7 @@ class VoronoiController:
         Updates the cell's fill and site colors based on the currently selected label.
         
         Args:
-            pos: [x, y] coordinates of the cell to update
+            pos: [x, y] coordinates of the mouse click with in the voronoi diagram
         """
         if self.label_model is None:
             return
@@ -467,7 +470,7 @@ class VoronoiController:
         In Select mode, assigns the cell to a label.
         
         Args:
-            pos: [x, y] coordinates for the operation
+            pos: [x, y] the mouse coordinates for the operation with in the Voronoi View widget
         """
         if self.mode == DrawModes.Add:
             # Add mode: add a new site and regenerate the diagram
@@ -518,7 +521,7 @@ class VoronoiController:
         self.mode = m
 
     def toggleLines(self, l):
-        """Toggle the visibility of cell border lines.
+        """Toggle the visibility of cell borderlines.
         
         Args:
             l: bool - True to show lines, False to hide them
@@ -608,7 +611,7 @@ class VoronoiController:
         return self.LineThickness
 
     def setLineThickness(self, t):
-        """Set the thickness of cell border lines.
+        """Set the thickness of cell borderlines.
         
         Args:
             t: Thickness value in pixels
