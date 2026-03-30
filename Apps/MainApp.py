@@ -1,3 +1,9 @@
+"""
+MainApp Module
+Main application window for the Voronoi Diagram Generator.
+Manages the UI layout, menu bar, and coordinates between the controller and views.
+"""
+
 import sys
 
 from PySide6.QtGui import QAction
@@ -16,10 +22,19 @@ from Apps.CreationModel import CreationModel
 
 
 class MainWindow(QMainWindow):
+    """Main application window for the Voronoi Diagram Generator.
+    
+    Manages the UI layout with a Voronoi canvas, toolbar, and label manager.
+    Acts as the central hub coordinating between the controller, views, and menus.
+    """
     def __init__(self, creationModel = None, width = 0, height = 0, name = ""):
-        super().__init__()
-        """
-            The Main Application window.  Mostly acts as a UI, class, and layout manager
+        """Initialize the main application window.
+        
+        Args:
+            creationModel: Optional creation model with project data
+            width: Canvas width in pixels
+            height: Canvas height in pixels
+            name: Window title
         """
 
         if(creationModel):
@@ -55,29 +70,29 @@ class MainWindow(QMainWindow):
         self.setUpLayouts()
 
     def setUpMenuBar(self):
-        #setUpToolBar: creates the Menu bar and connects to related functions
-
-        # creating the File Actions
+        """Create and configure the menu bar with File menu options."""
+        # Create File menu actions
         new_action = QAction("New Project", self)
         new_action.setStatusTip("This creates a new Project")
         new_action.triggered.connect(self.newProject)
-        # adding the Open action
+
         open_action = QAction("Open Project", self)
         open_action.setStatusTip("This Opens a Project")
         open_action.triggered.connect(self.openProject)
-        # adding the Export action
+
         save_action = QAction("Save Project", self)
         save_action.setStatusTip("This saves the current Project")
         save_action.triggered.connect(self.saveProject)
-        # adding the Export action
+
         export_action = QAction("Export Diagram", self)
         export_action.setStatusTip("This exports the Voronoi Diagram as an image")
         export_action.triggered.connect(self.exportDiagram)
-        # adding the Quit action
+
         quit_action = QAction("Quit", self)
         quit_action.setStatusTip("Closes Program")
         quit_action.triggered.connect(QCoreApplication.quit)
 
+        # Add actions to File menu
         file_menu = self.menu.addMenu("&File")
         file_menu.addAction(new_action)
         file_menu.addAction(open_action)
@@ -87,38 +102,40 @@ class MainWindow(QMainWindow):
 
 
     def setUpVoronoi(self, cx, cy):
-        #self.voroController.setCanvasSize(cx,cy)
+        """Configure the Voronoi controller and connect it to the label model."""
         self.voroController.setLabelModel(self.label_model)
 
     def setUpLabels(self):
+        """Initialize label settings (placeholder)."""
         pass
+
     def setUpParser(self):
+        """Initialize parser (placeholder)."""
         pass
 
     def setUpLayouts(self):
-        #Left Side Bar
+        """Construct the main UI layout with toolbar, canvas, and label panel."""
+        # Left sidebar with toolbar and labels
         tool_layout = QVBoxLayout()
         tool_layout.setSpacing(15)
         tool_layout.setContentsMargins(10, 10, 10, 10)
-
-        #adding important widgets to the sidebars
         tool_layout.addWidget(self.toolBar)
 
-        #adding the label scroll bar
+        # Add scrollable label view to sidebar
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.label_view)
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-
         tool_layout.addWidget(scroll)
         tool_layout.addStretch()
 
+        # Create left panel widget
         tool_panel = QWidget()
         tool_panel.setLayout(tool_layout)
         tool_panel.setMinimumWidth(350)
         tool_panel.setMaximumWidth(450)
 
-        #Main layout ( contains left sidebar, canvas, and right sidebar
+        # Main layout: sidebar + canvas
         main_layout = QHBoxLayout()
         main_layout.setSpacing(20)
         main_layout.setContentsMargins(10, 10, 10, 10)
@@ -130,27 +147,25 @@ class MainWindow(QMainWindow):
         main_layout.addLayout(content_layout)
         main_layout.addStretch(1)
 
+        # Set central widget
         central = QWidget()
         central.setLayout(main_layout)
         self.setCentralWidget(central)
 
-    """
-        Main App related functions. 
-    """
     def newProject(self):
-        #this function will create a new project
+        """Create a new project (placeholder)."""
         print("Create new Project")
 
     def openProject(self):
-        #this function will open a project
+        """Open an existing project (placeholder)."""
         print("Open Project")
 
     def saveProject(self):
-        #this function will save the project
+        """Save the current project (placeholder)."""
         print("Saving Project")
 
     def exportDiagram(self):
-        #this function will export the voronoi diagram as an image
+        """Export the Voronoi diagram as an image (placeholder)."""
         print("Exporting Voronoi Diagram")
 
 
