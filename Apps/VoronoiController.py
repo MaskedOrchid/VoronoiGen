@@ -16,7 +16,7 @@ from shapely.creation import geometrycollections
 from Apps.VoronoiView import VoronoiView
 
 
-class Poly:
+class Cell:
     """
     Represents a single Voronoi cell with its associated metadata.
     
@@ -26,54 +26,34 @@ class Poly:
     Attributes:
         Site: Shapely Point object representing the Voronoi site
         polygon: QPolygonF representing the cell boundaries
-        FillColor: QColor for filling the cell
-        SiteColor: QColor for drawing the site point
+        Label: a Label object for this cell/Site
     """
-    def __init__(self, s, p, sc, fc):
+    def __init__(self, p, l):
         """Initialize a Poly object with site, polygon, and colors.
         
         Args:
             s: Shapely Point representing the site
             p: QPolygonF representing the cell boundary
-            sc: QColor for the site point
-            fc: QColor for filling the cell
+            l: a Label object representing the label associated to this cell
         """
-        self.Site = s
         self.polygon = p
-        self.FillColor = fc
-        self.SiteColor = sc
-
-    def getSite(self):
-        """Get the Shapely Point representing the site."""
-        return self.Site
+        self.label=l
 
     def getPolygon(self):
         """Get the QPolygonF representing the cell boundary."""
         return self.polygon
 
-    def getFillColor(self):
+    def getLabel(self):
         """Get the QColor used to fill the cell."""
-        return self.FillColor
+        return self.label
 
-    def getSiteColor(self):
-        """Get the QColor used to draw the site point."""
-        return self.SiteColor
-
-    def setFillColor(self, fc):
-        """Set the fill color for the cell.
+    def setLabel(self, l):
+        """Set the Label for the site/cell
         
         Args:
-            fc: QColor for filling the cell
+            l: the site's label
         """
-        self.FillColor = fc
-
-    def setSiteColor(self, sc):
-        """Set the color for the site point.
-        
-        Args:
-            sc: QColor for drawing the site
-        """
-        self.SiteColor = sc
+        self.label=l
 
     def setPolygon(self, p):
         """Set the boundary polygon for the cell.
@@ -83,23 +63,11 @@ class Poly:
         """
         self.polygon = p
 
-    def setSite(self, s):
-        """Set the site point for the cell.
-        
-        Args:
-            s: Shapely Point representing the site
-        """
-        self.Site = s
+    def removeSelfFromLabel(self):
+        """Removes self from the Label"""
+        if self.label is not None:
+            self.label.removeSite(self)
 
-    def __eq__(self, other):
-        """Compare two Poly objects by their site points."""
-        if isinstance(other, Poly):
-            return other.Site == self.Site
-        return False
-
-    def __ne__(self, other):
-        """Handles the ! or not for equalities between polys"""
-        return not self.__eq__(other)
 
 
 class VoronoiModel:
@@ -112,14 +80,15 @@ class VoronoiModel:
     """
     def __init__(self):
         """Initialize the Voronoi model with empty sites and polygons."""
-        self.Polys = []   # List of Poly objects representing cells
-        self.Sites = []   # List of Shapely Point objects representing sites
 
-    def addSite(self, newsite):
+        self.Sites = {}   # Dictionary of Shapely Point objects representing sites and their cell
+
+    def addSite(self, newsite,l):
         """Add a new site to the model if it doesn't already exist.
         
         Args:
             newsite: [x, y] coordinates for the new site
+            l: this site's label
             
         Returns:
             bool: True if site was added, False if it already exists
@@ -127,49 +96,60 @@ class VoronoiModel:
         new_point = Point(newsite[0], newsite[1])
         if new_point in self.Sites:
             return False
-        self.Sites.append(new_point)
+        self.Sites[new_point]=Cell(QPolygonF(),l)
         return True
 
-    def removeSite(self, site):
+    def removeSite(self, point):
         """Remove a site based on point coordinates.
         
         Finds the polygon containing the point and removes its associated site
         
         Args:
-            site: [x, y] coordinates of the point to remove
+            point: [x, y] coordinates of the point to remove
             
         Returns:
             bool: True if site was removed, False if not found
         """
-        p = self.findPolyContainPoint(site)
-        if p is not None:
-            self.Sites.remove(p.getSite())
-            self.clearPolys()
+        s = self.findSiteContainPoint(point)
+        if s is not None:
+            c=self.Sites.get(s)
+            c.removeSelfFromLabel() #making the cell remove itself from the label
+            self.Sites.pop(s) #removing the site from the dictionary
             return True
+
+        print("Error could not find target site to remove")
         return False
 
     def clearPolys(self):
-        """Clear all polygons from the model."""
-        self.Polys.clear()
+        """Clear all sites and polygons from the model."""
+        self.Sites.clear()
 
-    def addPoly(self, s, p, sc, fc):
-        """Add a new polygon to the model.
+    def setCell(self, s, p):
+        """Set a new polygon to a site
         
         Args:
             s: Shapely Point for the site
             p: QPolygonF for the cell's edges
-            sc: QColor for the site's color
-            fc: QColor for the cell's color fill
         """
-        self.Polys.append(Poly(s, p, sc, fc))
+        c=self.Sites.get(s)
+        c.setPolygon(p)
+    def setLabel(self,s,l):
+        """sets a site's label to the model.
 
-    def getPolys(self):
+        Args:
+           s: Shapely Point for the site
+           l: A label object
+         """
+        c = self.Sites.get(s)
+        c.setLabel(l)
+
+    def getCells(self):
         """Get all polygon objects in the model.
         
         Returns:
             list: List of Poly objects
         """
-        return self.Polys
+        return self.Sites.values()
 
     def getSites(self):
         """Get all site points in the model.
@@ -177,24 +157,26 @@ class VoronoiModel:
         Returns:
             list: List of Shapely Point objects
         """
-        return self.Sites
+        return list(self.Sites.keys())
 
-    def findPolyContainPoint(self, site):
+    def findSiteContainPoint(self, point):
         """Find the polygon containing the given point coordinates.
         
         Args:
             site: [x, y] coordinates to try to find the closest site point
             
         Returns:
-            Poly: The polygon object containing the point, or None if not found
+            s: the cell's site that contains this point
         """
-        pt = QPointF(site[0], site[1])
-        for p in self.Polys:
+        pt = QPointF(point[0], point[1])
+        for s in self.Sites:
+            p=self.Sites.get(s)
             # Use odd-even fill rule for point containment check
             if p.getPolygon().containsPoint(pt, Qt.FillRule.OddEvenFill):
-                return p
+
+                return s
         return None
-        
+
     def getPolyFromSite(self, site):
         """Find the polygon associated with a given site.
         
@@ -202,11 +184,20 @@ class VoronoiModel:
             site: Shapely Point representing the site
             
         Returns:
-            Poly: The polygon object for this site, or None if not found
+            C: The cell object for this site, or None if not found
         """
-        for p in self.Polys:
-            if p.getSite() == site:
-                return p
+        c=self.Sites.get(site)
+        return c
+    def getCell(self,site):
+        """Find the polygon associated with a given site.
+
+        Args:
+            site: Shapely Point representing the site
+
+        Returns:
+            C: The cell object for this site, or None if not found
+        """
+        return self.Sites.get(site)
 
 
 class DrawModes(Enum):
@@ -253,7 +244,6 @@ class VoronoiController:
         self.SitesEnabled = True       # Show/hide site points
         self.LinesEnabled = True       # Show/hide cell borders
         self.LineColor = QColor(0, 0, 0)  # Color for cell borders (black)
-        self.LineThickness = 3         # Width of cell borderlines
 
         # Define the bounding area for Voronoi computation
         self.area = MultiPoint(
@@ -331,11 +321,13 @@ class VoronoiController:
         Returns:
             bool: True if site was added successfully, False if it already exists
         """
-        # Add site to label model if one is active
+        l=None
+        # Add site to the currently selected label.
         if self.label_model is not None:
             self.label_model.add_site_to_label(newsite)
+            l=self.label_model.get_selected_label()
         # Add site to the data model
-        return self.data.addSite(newsite)
+        return self.data.addSite(newsite,l)
 
     def removeSite(self, pos):
         """Remove a site at the given coordinates.
@@ -343,28 +335,18 @@ class VoronoiController:
         Removes the site from the label model(s) and the data model.
         
         Args:
-            pos: [x, y] coordinates of the mouse click event r
+            pos: [x, y] coordinates of the mouse click event
             
         Returns:
             bool: True if site was removed, False if not found
         """
-        # Remove site from all labels if a label model is active
-        if self.label_model is not None:
-            rmpoly = self.data.findPolyContainPoint(pos)
-            if rmpoly is None:
-                print("Error could not find target site to remove")
-            else:
-                # Finding the closest site that will approximate which site needs to be removed
-                rmsite = self.data.findPolyContainPoint(pos).getSite()
-                self.label_model.remove_site_from_all_labels(rmsite)
-
-        # Remove from data model
+        # Finding the closest site that will approximate which site needs to be removed
         return self.data.removeSite(pos)
 
     def regenerateVoronoi(self):
         """Recompute the Voronoi diagram from current sites.
         
-        Uses Shapely's voronoi_polygons function to compute the diagram
+        Uses Shapley's voronoi_polygons function to compute the diagram
         based on the current set of sites, with result clipped to the canvas dimensions
         """
         sites = self.data.getSites()
@@ -375,6 +357,8 @@ class VoronoiController:
         # Convert sites to Shapely MultiPoint
         tempMulti = MultiPoint(sites)
         # Compute Voronoi polygons clipped to the canvas area
+        #ordered must be true
+        #   polygons and sites will not share the same index otherwise
         self.Voro = voronoi_polygons(
             tempMulti,
             tolerance=self.Tolerance,
@@ -395,8 +379,6 @@ class VoronoiController:
             self.data.clearPolys()
             return
 
-        # Clear old polygons and rebuild
-        self.data.clearPolys()
         i = 0
 
         # Convert each Shapely polygon to a QPolygonF and create a Poly object
@@ -410,14 +392,8 @@ class VoronoiController:
             polygon = QPolygonF(templist)
             site = sites[i]
 
-            # Get associated label for this site if it exists
-            l = self.label_model.get_label_with_site(site) if self.label_model else None
-            if l is None:
-                # Use default colors if no label is assigned
-                self.data.addPoly(site, polygon, Qt.black, Qt.white)
-            else:
-                # Use colors from the label
-                self.data.addPoly(site, polygon, l.getSiteColor(), l.getFillColor())
+            # setting this site's cell's polygon
+            self.data.setCell(site,polygon)
             i += 1
 
     def assignCellToLabel(self, site):
@@ -435,13 +411,13 @@ class VoronoiController:
         # Add site to the currently selected label
         self.label_model.add_site_to_label(site)
 
-    def assignLabelToCell(self, pos):
+    def assignLabelToCell(self, site):
         """Assign a label's colors to a cell at the given position.
         
         Updates the cell's fill and site colors based on the currently selected label.
         
         Args:
-            pos: [x, y] coordinates of the mouse click with in the voronoi diagram
+            site: Shapely Point representing the site to assign
         """
         if self.label_model is None:
             return
@@ -451,16 +427,11 @@ class VoronoiController:
         if selected_label is None:
             return
 
-        # Find the polygon at the given position
-        p = self.data.findPolyContainPoint(pos)
-        if p is None:
+        # Find the cell at the given position
+        if site is None:
             return
         # Update the cell's colors from the label
-        p.setFillColor(selected_label.getFillColor())
-        p.setSiteColor(selected_label.getSiteColor())
-
-        # Render the updated canvas
-        self.updateCanvas()
+        self.data.setLabel(site,selected_label)
 
     def updateDiagram(self, pos):
         """Update the Voronoi diagram based on the current mode and position.
@@ -492,10 +463,12 @@ class VoronoiController:
 
         elif self.mode == DrawModes.Select:
             # Select mode: assign cell to a label and update its colors
-            p = self.data.findPolyContainPoint(pos)
-            if p is not None:
-                self.assignCellToLabel(p.getSite())
-                self.assignLabelToCell(pos)
+            site = self.data.findSiteContainPoint(pos)
+            if site is not None:
+                self.assignCellToLabel(site)
+                self.assignLabelToCell(site)
+                # Render the updated canvas
+                self.updateCanvas()
 
     def updateCanvas(self):
         """Render the current state of the diagram to the canvas.
@@ -538,14 +511,33 @@ class VoronoiController:
         self.SitesEnabled = s
         self.updateCanvas()
 
+    def setSiteSize(self, s):
+        """
+        Set the size of the site dots used for drawing cell borders.
+
+        Args:
+            s: radius value (float) in pixels for the site dots
+        """
+        self.can.setSiteSize(s)
+        self.updateCanvas()
+
     def setLineColor(self, c):
         """Set the color for drawing cell borders.
         
         Args:
             c: QColor for the lines
         """
-        self.LineColor = c
+        self.can.setLineColor(c)
         self.updateCanvas()
+
+    def setLineThickness(self, t):
+        """
+        Set the thickness of the pen used for drawing cell borders.
+
+        Args:
+            t: Thickness value (float) in pixels for the pen stroke width
+        """
+        self.can.setLineThickness(t)
 
     def getMode(self):
         """Get the current interaction mode.
@@ -570,14 +562,6 @@ class VoronoiController:
             bool: True if sites are enabled, False otherwise
         """
         return self.SitesEnabled
-
-    def getLineColor(self):
-        """Get the current line color.
-        
-        Returns:
-            QColor: The color of cell borders
-        """
-        return self.LineColor
 
     def getData(self):
         """Get the data model.
@@ -608,18 +592,24 @@ class VoronoiController:
         Returns:
             int: The thickness in pixels
         """
-        return self.LineThickness
+        return self.can.getLineThickness()
 
-    def setLineThickness(self, t):
-        """Set the thickness of cell borderlines.
-        
-        Args:
-            t: Thickness value in pixels
+    def getLineColor(self):
+        """Get the current line color for cell borders.
+
+        Returns:
+            Qcolor: The color of the lines
         """
-        self.LineThickness = t
-        # Update the canvas view with the new thickness
-        if self.can:
-            self.can.setLineThickness(t)
+        return self.can.getLineColor()
+
+
+    def getSiteSize(self):
+        """Get the current site size
+
+        Returns:
+            int: The radius in pixels
+        """
+        return self.can.getSiteSize()
 
     def onLabelChange(self, label):
         """Handle changes to a label by updating all associated cells.
@@ -630,14 +620,15 @@ class VoronoiController:
         Args:
             label: The label object that was changed
         """
-        # Get all sites associated with the changed label
-        sites = label.getSites()
-        # Update colors for all cells belonging to this label
-        for s in sites:
-            p = self.data.getPolyFromSite(s)
-            if p is not None:
-                p.setFillColor(label.getFillColor())
-                p.setSiteColor(label.getSiteColor())
+        # # Get all sites associated with the changed label
+        # sites = label.getSites()
+        # # Update colors for all cells belonging to this label
+        # for s in sites:
+        #     p = self.data.getPolyFromSite(s)
+        #     if p is not None:
+        #         p.setFillColor(label.getFillColor())
+        #         p.setSiteColor(label.getSiteColor())
 
         # Render the updated diagram
+        # this needs to be changed to receive a signal when to change
         self.updateCanvas()

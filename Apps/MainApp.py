@@ -4,7 +4,7 @@ Main application window for the Voronoi Diagram Generator.
 Manages the UI layout, menu bar, and coordinates between the controller and views.
 """
 
-import sys
+
 
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import (
