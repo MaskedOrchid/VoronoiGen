@@ -141,6 +141,7 @@ class VoronoiController:
 
 
     def setCanvasSize(self, dimX, dimY):
+        # This sets the canvas size to a new size. It also redefines the bounds.
         self.can.setCanvasSize(dimX,dimY)
         self.area = MultiPoint(
             [[0, 0], [dimX, 0], [dimX, dimY], [0, dimY]]
@@ -148,6 +149,7 @@ class VoronoiController:
         self.can.setLineThickness(self.LineThickness)
 
     def setLabelModel(self,l):
+        #a nessary function to properly have a reference to the label model
         self.label_model=l
         self.label_model.give_model_vc(self)
 
@@ -156,6 +158,7 @@ class VoronoiController:
         return self.can
 
     def generateRandomPoints(self, n):
+        #a testing function to generate a random set of sites
         if self.can is None:
             return
 
@@ -168,11 +171,14 @@ class VoronoiController:
             self.updateDiagram(newpos)
 
     def addSite(self, newsite):
+        #Adding a site to the voronoi diagram, also adds it to the currenly selected label
+        #need to change this
         if self.label_model is not None:
             self.label_model.add_site_to_label(newsite)
         return self.data.addSite(newsite)
 
     def removeSite(self, pos):
+        #removing a site from the voronoi diagram, also updates the labels
         if self.label_model is not None:
             rmpoly=self.data.findPolyContainPoint(pos)
             if rmpoly is None:
@@ -184,6 +190,8 @@ class VoronoiController:
         return self.data.removeSite(pos)
 
     def regenerateVoronoi(self):
+        #regenerates the voronoi diagram
+        #doing this is roughly nlogn
         sites = self.data.getSites()
         if len(sites) <= 0 or self.area is None:
             return
@@ -198,6 +206,8 @@ class VoronoiController:
         )
 
     def updatePolys(self):
+        #this updates the cells of the voronoio diagram and stores it
+        #the model, also updates with the current label information
         sites = self.data.getSites()
         if len(sites) <= 0:
             self.data.clearPolys()
@@ -222,13 +232,15 @@ class VoronoiController:
             i += 1
 
     def assignCellToLabel(self,site):
+        #assigns a cell to a label
+        # needs to be improved to not be so janky
         if self.label_model is None:
             return
         self.label_model.remove_site_from_all_labels(site)
         self.label_model.add_site_to_label(site)
 
     def assignLabelToCell(self, pos):
-        # This function assigns a color to the Poly object
+        # This function assigns a color to the Poly object from it's label
         if self.label_model is None:
             return
 
@@ -243,6 +255,7 @@ class VoronoiController:
         self.updateCanvas()
 
     def updateDiagram(self, pos):
+        #this function handles updating the diagram based off of the mode options
         if self.mode == DrawModes.Add:
             if self.addSite(pos):
                 self.regenerateVoronoi()
@@ -264,9 +277,9 @@ class VoronoiController:
             self.assignLabelToCell(pos)
 
     def updateCanvas(self):
+        #this function alerts the view to update and render the current voronoi diagram
         if not self.can:
             return
-
         self.can.renderCells()
 
         if self.SitesEnabled:
