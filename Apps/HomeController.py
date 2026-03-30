@@ -4,6 +4,9 @@ from Apps import (HomeView, CreationModel, CreationView, MainApp)
 
 import sys
 
+
+# Main controller class for the home application. Handles input logic and communicates with
+# Creation and Home classes.
 class HomeController():
     def __init__(self):
 
@@ -17,12 +20,16 @@ class HomeController():
         dialog = CreationView.CreationDialog(self)
         dialog.exec()
 
- #   def open_existing(self, checked):
+    #   TO DO: Implement opening existing project files.
+    #   def open_existing(self, checked):
 
     def exit_app(self):
         self.view.close()
 
+    # Takes in input from the CreationView and updates the CreationModel accordingly
     def alterModel(self, title = "", width = "", height = ""):
+
+        #   TO DO: Implement checks for file saving
         self.model.changeName(title)
         try:
             intedWidth = int(width)

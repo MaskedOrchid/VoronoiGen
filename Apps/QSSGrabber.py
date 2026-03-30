@@ -1,10 +1,14 @@
 from enum import Enum
 import os
 
+
+
 class Styles(Enum):
     GREENBUTTON = 0
     GRAYBUTTON = 1
 
+
+# QSSGrabber allows for pulling QSS files from the Stylesheets directory
 class QSSGrabber:
 
     def grabStyle(self, style: Styles):
