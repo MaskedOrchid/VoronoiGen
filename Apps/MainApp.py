@@ -36,6 +36,8 @@ class MainWindow(QMainWindow):
             height: Canvas height in pixels
             name: Window title
         """
+        super().__init__()
+
 
         if(creationModel):
             self.setWindowTitle(creationModel.getTitle())
