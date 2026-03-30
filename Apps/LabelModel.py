@@ -7,19 +7,20 @@ import json
 class LabelModel(QObject):
     """
     Model class that stores and manages a list of Labels.
+    Implements MVC pattern with signals for view updates.
     """
 
     # Signals to notify when model changes
-    label_added = Signal(object)  # Emits the added Label
+    label_added = Signal(object)    # Emits the added Label
     label_removed = Signal(object)  # Emits the removed Label
     label_updated = Signal(object)  # Emits the updated Label
-    labels_changed = Signal()  # Generic signal for any change
+    labels_changed = Signal()       # Generic signal for any change
 
     def __init__(self):
         super().__init__()
         self._labels = []  # List of Label objects
 
-        # Add initial labels
+        # Add initial labels for testing/demo
         self.add_label("Group 1")
         self.add_label("Group 2")
         self.add_label("Group 3")
@@ -28,7 +29,7 @@ class LabelModel(QObject):
     # ==================== CRUD Operations ====================
 
     def add_label(self, name, color=None):
-        """Add a new label to the model."""
+        """Add a new label to the model. Emits label_added signal."""
         if not name or not name.strip():
             raise ValueError("Label name cannot be empty")
 
@@ -36,7 +37,7 @@ class LabelModel(QObject):
             raise ValueError(f"Label '{name}' already exists")
 
         if color is None:
-            color = QColor(255, 255, 255)
+            color = QColor(255, 255, 255)  # Default white
 
         new_label = Label(name, color)
         self._labels.append(new_label)
@@ -47,7 +48,7 @@ class LabelModel(QObject):
         return new_label
 
     def remove_label(self, name):
-        """Remove a label by name."""
+        """Remove a label by name. Emits label_removed signal."""
         label = self.find_label(name)
         if label:
             self._labels.remove(label)
@@ -57,7 +58,7 @@ class LabelModel(QObject):
         return False
 
     def remove_label_by_object(self, label):
-        """Remove a label by object reference."""
+        """Remove a label by object reference. Emits label_removed signal."""
         if label in self._labels:
             self._labels.remove(label)
             self.label_removed.emit(label)
@@ -66,7 +67,7 @@ class LabelModel(QObject):
         return False
 
     def update_label_name(self, old_name, new_name):
-        """Update a label's name."""
+        """Update a label's name. Emits label_updated signal."""
         label = self.find_label(old_name)
         if not label:
             return False
@@ -74,6 +75,7 @@ class LabelModel(QObject):
         if not new_name or not new_name.strip():
             raise ValueError("Label name cannot be empty")
 
+        # Check for duplicate name (excluding self)
         existing = self.find_label(new_name)
         if existing and existing != label:
             raise ValueError(f"Label '{new_name}' already exists")
@@ -84,7 +86,7 @@ class LabelModel(QObject):
         return True
 
     def update_label_color(self, name, color):
-        """Update a label's fill color."""
+        """Update a label's fill color. Emits label_updated signal."""
         label = self.find_label(name)
         if label:
             label.setFillColor(color)
@@ -94,7 +96,7 @@ class LabelModel(QObject):
         return False
 
     def update_label_site_color(self, name, color):
-        """Update a label's site color."""
+        """Update a label's site/polygon color. Emits label_updated signal."""
         label = self.find_label(name)
         if label:
             label.setSiteColor(color)
@@ -106,34 +108,34 @@ class LabelModel(QObject):
     # ==================== Query Operations ====================
 
     def find_label(self, name):
-        """Find a label by name."""
+        """Find and return a label by name, or None if not found."""
         for label in self._labels:
             if label.Name == name:
                 return label
         return None
 
     def get_all_labels(self):
-        """Get all labels."""
+        """Return a copy of all labels (prevents external modification)."""
         return self._labels.copy()
 
     def get_label_count(self):
-        """Get number of labels."""
+        """Return the total number of labels."""
         return len(self._labels)
 
     def get_label_at_index(self, index):
-        """Get label at specific index."""
+        """Return label at specific index, or None if out of range."""
         if 0 <= index < len(self._labels):
             return self._labels[index]
         return None
 
     def get_label_names(self):
-        """Get list of all label names."""
+        """Return list of all label names."""
         return [label.Name for label in self._labels]
 
     # ==================== Site/Polygon Association ====================
 
     def add_site_to_label(self, label_name, site):
-        """Add a site to a label."""
+        """Associate a site with a label. Emits label_updated signal."""
         label = self.find_label(label_name)
         if label:
             label.addSite(site)
@@ -142,7 +144,7 @@ class LabelModel(QObject):
         return False
 
     def add_poly_to_label(self, label_name, poly):
-        """Add a polygon to a label."""
+        """Associate a polygon with a label. Emits label_updated signal."""
         label = self.find_label(label_name)
         if label:
             label.addPoly(poly)
@@ -153,14 +155,14 @@ class LabelModel(QObject):
     # ==================== Bulk Operations ====================
 
     def clear_all(self):
-        """Remove all labels."""
+        """Remove all labels. Emits labels_changed signal."""
         self._labels.clear()
         self.labels_changed.emit()
 
     # ==================== Persistence ====================
 
     def save_to_file(self, filepath):
-        """Save labels to JSON file."""
+        """Save all labels to a JSON file. Returns (success, message)."""
         try:
             data = []
             for label in self._labels:
@@ -186,7 +188,7 @@ class LabelModel(QObject):
             return False, f"Error saving: {str(e)}"
 
     def load_from_file(self, filepath):
-        """Load labels from JSON file."""
+        """Load labels from a JSON file. Returns (success, message)."""
         try:
             with open(filepath, 'r') as f:
                 data = json.load(f)
@@ -197,6 +199,7 @@ class LabelModel(QObject):
                 fill_color = QColor(*item['fill_color'])
                 label = Label(item['name'], fill_color)
 
+                # Load optional site_color if present (backward compatibility)
                 if 'site_color' in item:
                     site_color = QColor(*item['site_color'])
                     label.setSiteColor(site_color)
