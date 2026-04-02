@@ -208,6 +208,17 @@ class VoronoiModel:
             if p.getSite() == site:
                 return p
 
+    def setPolygon(self,site,p,fc=None,sc=None):
+        poly=self.getPolyFromSite(site)
+        if poly is None:
+            self.addPoly(site,p,fc,sc)
+        else:
+            poly.setPolygon(p)
+            if fc is not None:
+                poly.setFillColor(fc)
+            if sc is not None:
+                poly.setSiteColor(sc)
+
 
 class DrawModes(Enum):
     """Enumeration for the different interaction modes in the Voronoi diagram.
@@ -415,7 +426,7 @@ class VoronoiController:
             return
 
         # Clear old polygons and rebuild
-        self.data.clearPolys()
+        #self.data.clearPolys()
         i = 0
 
         # Convert each Shapely polygon to a QPolygonF and create a Poly object
@@ -433,10 +444,10 @@ class VoronoiController:
             l = self.label_model.get_label_with_site(site) if self.label_model else None
             if l is None:
                 # Use default colors if no label is assigned
-                self.data.addPoly(site, polygon, Qt.black, Qt.white)
+                self.data.setPolygon(site,polygon)
             else:
                 # Use colors from the label
-                self.data.addPoly(site, polygon, l.getSiteColor(), l.getFillColor())
+                self.data.setPolygon(site, polygon, l.getSiteColor(), l.getFillColor())
             i += 1
 
     def assignCellToLabel(self, site):
@@ -684,14 +695,14 @@ class VoronoiController:
         Args:
             label: The label object that was changed
         """
-        # Get all sites associated with the changed label
-        sites = label.getSites()
-        # Update colors for all cells belonging to this label
-        for s in sites:
-            p = self.data.getPolyFromSite(s)
-            if p is not None:
-                p.setFillColor(label.getFillColor())
-                p.setSiteColor(label.getSiteColor())
-
-        # Render the updated diagram
+        # # Get all sites associated with the changed label
+        # sites = label.getSites()
+        # # Update colors for all cells belonging to this label
+        # for s in sites:
+        #     p = self.data.getPolyFromSite(s)
+        #     if p is not None:
+        #         p.setFillColor(label.getFillColor())
+        #         p.setSiteColor(label.getSiteColor())
+        #
+        # # Render the updated diagram
         self.updateCanvas()

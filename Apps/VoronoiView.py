@@ -5,7 +5,7 @@ Displays Voronoi cells and sites, handles user interactions, and manages paintin
 """
 
 from PySide6.QtCore import QSize, Qt, QPointF
-from PySide6.QtGui import QImage, QPainter, QPen, QBrush, QPaintEvent, QMouseEvent
+from PySide6.QtGui import QImage, QPainter, QPen, QBrush, QPaintEvent, QMouseEvent, QColor
 from PySide6.QtWidgets import QWidget
 
 
@@ -97,8 +97,12 @@ class VoronoiView(QWidget):
         for p in polys:
             sitepoint = p.getSite()
             # Set pen and brush to the site's color
-            self.Brush.setColor(p.getSiteColor())
-            self.Pen.setColor(p.getSiteColor())
+            if p.getSiteColor() is None:
+                self.Brush.setColor(QColor(0,0,0))
+                self.Pen.setColor(QColor(0,0,0))
+            else:
+                self.Brush.setColor(p.getSiteColor())
+                self.Pen.setColor(p.getSiteColor())
 
             painter.setPen(self.Pen)
             painter.setBrush(self.Brush)
@@ -118,7 +122,6 @@ class VoronoiView(QWidget):
         """
         # Create painter for drawing on the image buffer
         painter = QPainter(self.Image)
-        
         # Retrieve all polygons from the Voronoi data
         polys = self.voro.getData().getPolys()
 
@@ -128,7 +131,10 @@ class VoronoiView(QWidget):
         # Draw each Voronoi cell polygon
         for p in polys:
             # Set the fill color for this cell
-            self.Brush.setColor(p.getFillColor())
+            if p.getFillColor() is None:
+                self.Brush.setColor(QColor(255,255,255))
+            else:
+                self.Brush.setColor(p.getFillColor())
 
             # Determine line color: either user-specified or match cell fill color
             if self.voro.getLineToggle():
@@ -136,7 +142,10 @@ class VoronoiView(QWidget):
                 self.Pen.setColor(self.voro.getLineColor())
             else:
                 # Otherwise use the cell's fill color (invisible borders)
-                self.Pen.setColor(p.getFillColor())
+                if p.getFillColor() is None:
+                    self.Pen.setColor(QColor(255, 255, 255))
+                else:
+                    self.Pen.setColor(p.getFillColor())
 
             painter.setPen(self.Pen)
             painter.setBrush(self.Brush)
