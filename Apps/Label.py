@@ -4,7 +4,7 @@ from PySide6.QtGui import QColor
 class Label:
     def __init__(self, name="", color=QColor(255, 255, 255)):
         self.Name = name
-        self.FillColor = QColor(255, 255, 255)
+        self.FillColor = color
         self.SiteColor = QColor(0, 0, 0)
         self.Sites = []
         self.Polys = []
@@ -45,3 +45,10 @@ class Label:
 
     def __str__(self):
         return self.Name
+
+    def __eq__(self, other):
+        if not isinstance(other, Label):
+            return NotImplemented
+        return (self.Name == other.Name
+                and self.FillColor == other.FillColor
+                and self.SiteColor == other.SiteColor)

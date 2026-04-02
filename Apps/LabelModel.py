@@ -24,6 +24,10 @@ class LabelModel(QObject):
         self.labels.append(new_label)
         self.label_added.emit(new_label)
 
+    def add_label_complete(self, label):
+        self.labels.append(label)
+        self.label_added.emit(label)
+
     def remove_label_by_object(self, label):
         if label in self.labels:
             if self.selected_label == label:
@@ -64,13 +68,13 @@ class LabelModel(QObject):
 
     def add_site_to_label(self,site):
         if self.selected_label is not None:
-
             self.selected_label.addSite(site)
 
     def get_label_with_site(self,site):
-        for l in  self.labels:
+        for l in self.labels:
             if site in l.getSites():
                 return l
+
     def remove_site_from_all_labels(self,site):
         for l in  self.labels:
             if site in l.getSites():

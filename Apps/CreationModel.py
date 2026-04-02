@@ -7,6 +7,9 @@ class CreationModel:
         self.title = tt
         self.canvasWidth = cx
         self.canvasHeight = cy
+        self.file = ""
+        self.labels = []
+        self.packages = []
 
     def changeName(self, newName):
         self.title = newName
@@ -25,3 +28,9 @@ class CreationModel:
 
     def height(self):
         return self.canvasHeight
+
+    def changeFile(self, newFile):
+        self.file = newFile
+
+    def getFile(self):
+        return self.file

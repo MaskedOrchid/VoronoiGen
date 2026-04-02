@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
         """
         super().__init__()
 
-
+        self.model = creationModel
         if(creationModel):
             self.setWindowTitle(creationModel.getTitle())
             self.width = creationModel.width()
@@ -106,6 +106,8 @@ class MainWindow(QMainWindow):
     def setUpVoronoi(self, cx, cy):
         """Configure the Voronoi controller and connect it to the label model."""
         self.voroController.setLabelModel(self.label_model)
+        self.voroController.setUpFromModel(self.model.labels, self.model.packages)
+
 
     def setUpLabels(self):
         """Initialize label settings (placeholder)."""

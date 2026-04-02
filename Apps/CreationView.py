@@ -16,9 +16,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QDialog, QDialogButtonBox,
-    QHBoxLayout, QLabel, QLineEdit, QSizePolicy,
-    QSpacerItem, QVBoxLayout, QWidget)
+    QHBoxLayout, QLabel, QLineEdit, QPushButton,
+    QSizePolicy, QSpacerItem, QVBoxLayout, QWidget, QFileDialog)
 
+import os
 import HomeController
 
 class Ui_CreationView(object):
@@ -73,6 +74,32 @@ class Ui_CreationView(object):
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_3)
+
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.pushButton = QPushButton(self.verticalLayoutWidget)
+        self.pushButton.setObjectName(u"pushButton")
+
+        self.horizontalLayout.addWidget(self.pushButton)
+
+        self.pushButton_2 = QPushButton(self.verticalLayoutWidget)
+        self.pushButton_2.setObjectName(u"pushButton_2")
+
+        self.horizontalLayout.addWidget(self.pushButton_2)
+
+        self.label_3 = QLabel(self.verticalLayoutWidget)
+        self.label_3.setObjectName(u"label_3")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.label_3.sizePolicy().hasHeightForWidth())
+        self.label_3.setSizePolicy(sizePolicy1)
+        self.label_3.setAlignment(Qt.AlignCenter)
+
+        self.horizontalLayout.addWidget(self.label_3)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout)
 
         self.horizontalLayout_12 = QHBoxLayout()
         self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
@@ -139,9 +166,13 @@ class Ui_CreationView(object):
         CreationView.setWindowTitle(QCoreApplication.translate("CreationView", u"Create a New Project", None))
         self.label.setText(QCoreApplication.translate("CreationView", u"New Project", None))
         self.lineEdit.setPlaceholderText(QCoreApplication.translate("CreationView", u"Enter New Project Name...", None))
+        self.pushButton.setText(QCoreApplication.translate("CreationView", u"Open File", None))
+        self.pushButton_2.setText(QCoreApplication.translate("CreationView", u"Remove File", None))
+        self.label_3.setText(QCoreApplication.translate("CreationView", u"No File Selected.", None))
         self.label_9.setText(QCoreApplication.translate("CreationView", u"Canvas Width", None))
         self.label_2.setText(QCoreApplication.translate("CreationView", u"Canvas Height", None))
     # retranslateUi
+
 
 
 class CreationDialog(QDialog):
@@ -150,8 +181,12 @@ class CreationDialog(QDialog):
 
         self.controller = controller
 
+        self.dialog = QFileDialog()
+
         self.ui = Ui_CreationView()
         self.ui.setupUi(self)
+        self.ui.pushButton.clicked.connect(self.open_file_dialog)
+        self.ui.pushButton_2.clicked.connect(self.reset_file_dialog)
 
     def accept(self):
 
@@ -160,5 +195,23 @@ class CreationDialog(QDialog):
             self.controller.initializeMainApp()
             super().accept()
         return
+
+    def reset_file_dialog(self):
+        self.ui.label_3.setText("No File Selected.")
+        self.controller.setFile("")
+
+    def open_file_dialog(self):
+        filename = self.dialog.getOpenFileName(self, caption="Open Data File", filter="CSV Files (*.csv)")
+        if not filename:
+            self.ui.label_3.setText("No File Selected.")
+            self.controller.setFile("")
+        else:
+           if filename[0]:
+                self.ui.label_3.setText(f"{os.path.basename(filename[0])}")
+                self.controller.setFile(filename[0])
+           else:
+               self.ui.label_3.setText("No File Selected.")
+               self.controller.setFile("")
+
 
 

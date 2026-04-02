@@ -14,7 +14,7 @@ from shapely import voronoi_polygons
 from shapely.creation import geometrycollections
 
 from Apps.VoronoiView import VoronoiView
-
+from Apps import CellDialog
 
 class Poly:
     """
@@ -261,7 +261,26 @@ class VoronoiController:
         )
         # label model for associating labels with cells
         self.label_model = None
+        self.cell_dialog = None
 
+    def setUpFromModel(self, labels, packages):
+        for label in labels:
+            self.label_model.add_label_complete(label)
+        for package in packages:
+            self.addSite([package.xPosition, package.yPosition])
+            site = self.data.getSites()[-1]
+            self.label_model.set_selected_label(self.grabCorrectLabel(package.label))
+            self.assignCellToLabel(site)
+
+        self.regenerateVoronoi()
+        self.updatePolys()
+        self.updateCanvas()
+
+
+    def grabCorrectLabel(self, label):
+        for lbl in self.label_model.get_all_labels():
+            if lbl == label: return lbl
+        return None
 
     def setCanvasSize(self, dimX, dimY):
         """Update the canvas dimensions and bounding area.
@@ -459,6 +478,9 @@ class VoronoiController:
         p.setFillColor(selected_label.getFillColor())
         p.setSiteColor(selected_label.getSiteColor())
 
+        self.label_model.remove_site_from_all_labels(p.Site)
+        self.label_model.add_site_to_label(p.Site)
+
         # Render the updated canvas
         self.updateCanvas()
 
@@ -494,8 +516,36 @@ class VoronoiController:
             # Select mode: assign cell to a label and update its colors
             p = self.data.findPolyContainPoint(pos)
             if p is not None:
-                self.assignCellToLabel(p.getSite())
-                self.assignLabelToCell(pos)
+                self.cell_dialog = CellDialog.CellCustomizationDialog(self, p)
+                self.cell_dialog.exec()
+
+
+    def acceptCellDialogChanges(self, p, label, cellcolor, sitecolor, x, y):
+
+        site = p.getSite()
+        newSite = Point(x, y)
+
+        sites = self.data.getSites()
+        for i, k in enumerate(sites):
+            if k == site:
+                self.data.getSites()[i] = newSite
+                break
+
+        self.regenerateVoronoi()
+        self.updatePolys()
+
+        poly = self.data.findPolyContainPoint([x,y])
+        if poly is None:
+            return
+        else:
+            poly.setFillColor(cellcolor)
+            poly.setSiteColor(sitecolor)
+
+        if label:
+            self.label_model.set_selected_label(label)
+            self.assignLabelToCell([x, y])
+
+        self.updateCanvas()
 
     def updateCanvas(self):
         """Render the current state of the diagram to the canvas.
