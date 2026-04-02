@@ -544,6 +544,10 @@ class VoronoiController:
         if label:
             self.label_model.set_selected_label(label)
             self.assignLabelToCell([x, y])
+        else:
+            self.label_model.remove_site_from_all_labels(p.Site)
+            poly.setFillColor(cellcolor) #idk why its messed up sry
+            poly.setSiteColor(sitecolor)
 
         self.updateCanvas()
 

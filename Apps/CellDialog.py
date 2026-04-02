@@ -157,10 +157,13 @@ class CellCustomizationDialog(QDialog):
     def changeSiteColor(self, event):
         color = self.dialog2.getColor()
         if color.isValid():
-            self.siteColor = color
-            self.ui.siteColorFrame.setStyleSheet(
-                f"background-color: {color.name()}; border: 1px solid black;")
-        return
+            if self.siteColor != color :
+                self.selectedLabel = ""
+                self.ui.dropdown.setCurrentText("")
+                self.siteColor = color
+                self.ui.siteColorFrame.setStyleSheet(
+                    f"background-color: {color.name()}; border: 1px solid black;")
+            return
 
 
     def accept(self):
