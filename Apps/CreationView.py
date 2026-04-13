@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (QAbstractButton, QApplication, QDialog, QDialogBu
     QSizePolicy, QSpacerItem, QVBoxLayout, QWidget, QFileDialog)
 
 import os
-import HomeController
+from Apps import HomeController
 
 class Ui_CreationView(object):
     def setupUi(self, CreationView):

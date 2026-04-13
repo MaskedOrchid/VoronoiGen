@@ -1,6 +1,6 @@
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtGui import QColor
-from Label import Label
+from Apps.Label import Label
 
 
 class LabelModel(QObject):

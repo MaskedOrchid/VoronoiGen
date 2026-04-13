@@ -10,13 +10,13 @@ from PySide6.QtGui import QAction
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget,
     QHBoxLayout, QVBoxLayout, QPushButton,
-    QLabel, QScrollArea
+    QLabel, QScrollArea, QFileDialog
 )
 from PySide6.QtCore import Qt, QCoreApplication
 
-from VoronoiController import VoronoiController
-from CanvasTools import CanvasTools
-from LabelView import LabelView
+from Apps.VoronoiController import VoronoiController
+from Apps.CanvasTools import CanvasTools
+from Apps.LabelView import LabelView
 from Apps.CreationModel import CreationModel
 
 
@@ -169,8 +169,24 @@ class MainWindow(QMainWindow):
         print("Saving Project")
 
     def exportDiagram(self):
-        """Export the Voronoi diagram as an image (placeholder)."""
-        print("Exporting Voronoi Diagram")
+        """Export the Voronoi diagram as an image."""
+        dialog = QFileDialog(self)
+        dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
+        dialog.setNameFilters([
+            "PNG Image (*.png)",
+            "JPEG Image (*.jpg *.jpeg)",
+            "Bitmap Image (*.bmp)"
+        ])
+        dialog.setDefaultSuffix("png")
+
+        if dialog.exec():
+            file_path = dialog.selectedFiles()[0]
+            if file_path:
+                saved = self.voroController.getCanvas.Image.save(file_path)
+                if saved:
+                    print(f"Diagram exported to: {file_path}")
+                else:
+                    print(f"Failed to export diagram to: {file_path}")
 
 
 

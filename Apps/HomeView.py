@@ -7,7 +7,7 @@ from PySide6.QtCore import (QSize, Qt)
 
 import os
 
-import HomeController
+from Apps import HomeController
 from Apps.FontInitialization import FontInitialization
 from Apps.QSSGrabber import (QSSGrabber, Styles)
 
