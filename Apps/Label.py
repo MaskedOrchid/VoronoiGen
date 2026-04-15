@@ -2,12 +2,11 @@ from PySide6.QtGui import QColor
 
 
 class Label:
-    def __init__(self, name="", color=QColor(255, 255, 255)):
+    def __init__(self, name=""):
         self.Name = name
         self.FillColor = QColor(255, 255, 255)
         self.SiteColor = QColor(0, 0, 0)
         self.Sites = []
-        self.Polys = []
 
     def setFillColor(self, color):
         self.FillColor = color
@@ -31,17 +30,17 @@ class Label:
     def getSites(self):
         return self.Sites
 
-    def addPoly(self, poly):
-        if poly not in self.Polys:
-            self.Polys.append(poly)
-
     def removeSite(self, site):
         if site in self.Sites:
             self.Sites.remove(site)
 
-    def removePoly(self, poly):
-        if poly in self.Polys:
-            self.Polys.remove(poly)
-
     def __str__(self):
+        return self.Name
+
+    def __eq__(self, other):
+        if other is None:
+            return False
+        return self.Name == other.getName()
+
+    def __neg__(self):
         return self.Name

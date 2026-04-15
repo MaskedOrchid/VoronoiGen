@@ -102,6 +102,7 @@ class VoronoiView(QWidget):
             cell=self.voro.getData().getCell(s)
             label=cell.getLabel()
             if label is None:
+                print(("found None Label"))
                 self.Brush.setColor(QColor(255,255,255))
                 self.Pen.setColor(QColor(0,0,0))
             else:
@@ -140,6 +141,7 @@ class VoronoiView(QWidget):
             label=c.getLabel()
 
             if label is None:
+                print(("found None Label"))
                 self.Brush.setColor(QColor(255, 255, 255))
             else:
                 self.Brush.setColor(label.getFillColor())

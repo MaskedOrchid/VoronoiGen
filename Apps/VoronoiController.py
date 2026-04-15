@@ -7,7 +7,7 @@ Handles site management, diagram updates, and user interactions.
 import random
 from enum import Enum
 
-from PySide6.QtCore import Qt, QPointF
+from PySide6.QtCore import Qt, QPointF, Signal
 from PySide6.QtGui import QColor, QPolygonF
 from shapely import MultiPoint, Point
 from shapely import voronoi_polygons
@@ -24,9 +24,8 @@ class Cell:
     including the site point, cell polygon, and display colors.
     
     Attributes:
-        Site: Shapely Point object representing the Voronoi site
         polygon: QPolygonF representing the cell boundaries
-        Label: a Label object for this cell/Site
+        label: a Label object for this cell/Site
     """
     def __init__(self, p, l):
         """Initialize a Poly object with site, polygon, and colors.
@@ -133,6 +132,7 @@ class VoronoiModel:
         """
         c=self.Sites.get(s)
         c.setPolygon(p)
+
     def setLabel(self,s,l):
         """sets a site's label to the model.
 
@@ -173,7 +173,6 @@ class VoronoiModel:
             p=self.Sites.get(s)
             # Use odd-even fill rule for point containment check
             if p.getPolygon().containsPoint(pt, Qt.FillRule.OddEvenFill):
-
                 return s
         return None
 
@@ -198,6 +197,17 @@ class VoronoiModel:
             C: The cell object for this site, or None if not found
         """
         return self.Sites.get(site)
+
+    def cleanupCellLabels(self,defaultL,l):
+        """Searches and replaces any cells with null label to the default label
+
+        Args:
+            defaultL: the default label
+        """
+        for c in  self.Sites.values():
+            if c.getLabel() is None or c.getLabel()==l[0]:
+                #assumes that there will always be one label in the arg tuple
+                c.setLabel(defaultL)
 
 
 class DrawModes(Enum):
@@ -251,7 +261,23 @@ class VoronoiController:
         )
         # label model for associating labels with cells
         self.label_model = None
+        self.cell_dialog = None
 
+    def setUpFromModel(self,packages):
+        """Creates the Voronoi Diagram from parsed data.
+
+        Args:
+            packages= package that contains the parsed data.
+        """
+        for package in packages:
+            self.addSite([package.xPosition, package.yPosition])
+            site = self.data.getSites()[-1]
+            self.data.setLabel(site,package.label)
+            self.assignCellToLabel(site)
+
+        self.regenerateVoronoi()
+        self.updatePolys()
+        self.updateCanvas()
 
     def setCanvasSize(self, dimX, dimY):
         """Update the canvas dimensions and bounding area.
@@ -265,7 +291,6 @@ class VoronoiController:
         self.area = MultiPoint(
             [[0, 0], [dimX, 0], [dimX, dimY], [0, dimY]]
         )
-        self.can.setLineThickness(self.LineThickness)
 
     def setLabelModel(self, l):
         """Set the label model for managing cell labels.
@@ -274,8 +299,15 @@ class VoronoiController:
             l: Label model object to associate with this controller
         """
         self.label_model = l
-        # Notify the label model about this controller
-        self.label_model.give_model_vc(self)
+        self.connectLabelSignals()
+
+    def connectLabelSignals(self):
+
+
+        if self.label_model is not None:
+            #connecting the label model signals to the related functions
+            self.label_model.label_updated.connect(self.onLabelChange)
+            self.label_model.label_removed.connect(self.onLabelRemove)
 
     @property
     def getCanvas(self):
@@ -325,7 +357,10 @@ class VoronoiController:
         # Add site to the currently selected label.
         if self.label_model is not None:
             self.label_model.add_site_to_label(newsite)
-            l=self.label_model.get_selected_label()
+            if self.label_model.get_selected_label() is None:
+                l=self.label_model.get_default_label()
+            else:
+                l=self.label_model.get_selected_label()
         # Add site to the data model
         return self.data.addSite(newsite,l)
 
@@ -341,6 +376,9 @@ class VoronoiController:
             bool: True if site was removed, False if not found
         """
         # Finding the closest site that will approximate which site needs to be removed
+        s=self.data.findSiteContainPoint(pos)
+        self.label_model.remove_site_from_all_labels(s)
+
         return self.data.removeSite(pos)
 
     def regenerateVoronoi(self):
@@ -359,13 +397,22 @@ class VoronoiController:
         # Compute Voronoi polygons clipped to the canvas area
         #ordered must be true
         #   polygons and sites will not share the same index otherwise
-        self.Voro = voronoi_polygons(
-            tempMulti,
-            tolerance=self.Tolerance,
-            extend_to=self.area,
-            only_edges=False,
-            ordered=True,
-        )
+
+        oldvoro=self.Voro
+        try:
+            #trying to regenerate the voronoi diagram from updated data
+            self.Voro = voronoi_polygons(
+                tempMulti,
+                tolerance=self.Tolerance,
+                extend_to=self.area,
+                only_edges=False,
+                ordered=True,
+            )
+        except:
+            #if it failed, will revert to previous version of diagram
+            #note, will not revert site data which can cause a softlock
+            print("ERROR: Failed to regenerate Voronoi Diagram")
+            self.Voro=oldvoro
 
     def updatePolys(self):
         """Convert computed Voronoi polygons to Poly objects in the data model.
@@ -611,24 +658,20 @@ class VoronoiController:
         """
         return self.can.getSiteSize()
 
-    def onLabelChange(self, label):
+    def onLabelChange(self, *args):
         """Handle changes to a label by updating all associated cells.
         
         When a label's properties change (e.g., color), this method updates
         all cells associated with that label to reflect the new properties.
         
         Args:
-            label: The label object that was changed
+            *args: The label object that was changed
         """
-        # # Get all sites associated with the changed label
-        # sites = label.getSites()
-        # # Update colors for all cells belonging to this label
-        # for s in sites:
-        #     p = self.data.getPolyFromSite(s)
-        #     if p is not None:
-        #         p.setFillColor(label.getFillColor())
-        #         p.setSiteColor(label.getSiteColor())
+        self.updateCanvas()
 
-        # Render the updated diagram
-        # this needs to be changed to receive a signal when to change
+    def onLabelRemove(self,*args):
+        """Handles the removal of a label by correcting the data and setting the
+        cells with invalid label back to the default label
+        """
+        self.data.cleanupCellLabels(self.label_model.get_default_label(),args)
         self.updateCanvas()
