@@ -37,7 +37,7 @@ class Label:
     def __str__(self):
         return self.Name
 
-     def __eq__(self, other):
+    def __eq__(self, other):
         if other is None:
             return False
         return self.Name == other.getName()
