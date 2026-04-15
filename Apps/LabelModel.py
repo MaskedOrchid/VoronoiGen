@@ -80,3 +80,5 @@ class LabelModel(QObject):
 
     def get_default_label(self):
         return self.defaultLabel
+
+    def
