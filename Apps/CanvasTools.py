@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton
 
-from VoronoiController import DrawModes
+from Apps.VoronoiController import DrawModes
 
 
 class CanvasTools(QWidget):

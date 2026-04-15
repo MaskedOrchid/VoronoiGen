@@ -12,7 +12,7 @@ Apps/__pycache__/VoronoiHandler.cpython-314.pyc
 *.pyc
 Apps/__pycache__/LabelModel.cpython-313.pyc
 Apps/__pycache__/LabelView.cpython-313.pyc
-/.idea
-/.idea
-/Apps/__pycache__
-Apps/__pycache__/Label.cpython-313.pyc
+Apps\__pycache__\LabelView.cpython-314.pyc
+Apps\__pycache__\LabelModel.cpython-314.pyc
+Apps\__pycache__\Label.cpython-314.pyc
+Apps\__pycache__\CanvasTools.cpython-314.pyc

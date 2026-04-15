@@ -1,6 +1,6 @@
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtGui import QColor
-from Label import Label
+from Apps.Label import Label
 
 
 class LabelModel(QObject):
@@ -69,9 +69,10 @@ class LabelModel(QObject):
             self.label_updated.emit(self.selected_label)
 
     def get_label_with_site(self,site):
-        for l in  self.labels:
+        for l in self.labels:
             if site in l.getSites():
                 return l
+
     def remove_site_from_all_labels(self,site):
         for l in  self.labels:
             if site in l.getSites():
@@ -80,5 +81,3 @@ class LabelModel(QObject):
 
     def get_default_label(self):
         return self.defaultLabel
-
-    def

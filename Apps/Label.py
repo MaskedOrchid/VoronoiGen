@@ -4,7 +4,7 @@ from PySide6.QtGui import QColor
 class Label:
     def __init__(self, name=""):
         self.Name = name
-        self.FillColor = QColor(255, 255, 255)
+        self.FillColor = color
         self.SiteColor = QColor(0, 0, 0)
         self.Sites = []
 
@@ -37,7 +37,7 @@ class Label:
     def __str__(self):
         return self.Name
 
-    def __eq__(self, other):
+     def __eq__(self, other):
         if other is None:
             return False
         return self.Name == other.getName()

@@ -1,5 +1,66 @@
 # -=-=-=-=-=-=-=-=-= IGNORE THIS -=-=-=-=-=-=-=-=-=
 
+import pandas as pd
+import re
+from PySide6.QtGui import QColor
+
+
+from Apps import Label
+
+class ParsedPackage:
+
+    def __init__(self, x, y, l):
+        self.xPosition = x
+        self.yPosition = y
+        self.label = l
+
+
+
+
+class Parser:
+
+    def __init__(self):
+        self.labels = []
+        self.packages = []
+
+    def createLabel(self, n, c):
+        lbl = Label.Label(n,QColor(c))
+        if lbl in self.labels:
+            return lbl # will refactor later TO DO
+        else:
+            self.labels.append(lbl)
+            return lbl
+
+    def parse(self, filepath):
+        fileData = pd.read_csv(filepath, header=None, dtype=str)
+        for i, row in fileData.iterrows():
+            try:
+                x = int(row[0])
+                y = int(row[1])
+
+                n = ""
+                if len(row) > 2 and pd.notna(row[2]):
+                    n = str(row[2])
+
+                c = ""
+                if len(row) > 3 and pd.notna(row[3]):
+                    color = str(row[3])
+                    match = re.search(r'^#?(?:[0-9a-fA-F]{3}){1,2}$', color)
+                    if match:
+                        if color[0] != '#':
+                            c = '#' + color
+                        else:
+                            c = color
+                    else:
+                        c = "#FFFFFF"
+                lbl = self.createLabel(n,c)
+                pkg = ParsedPackage(x, y, lbl)
+                self.packages.append(pkg)
+
+            except(ValueError, KeyError):
+                continue
+
+
 
 
 """import pandas as pd

@@ -220,6 +220,17 @@ class VoronoiModel:
                 #assumes that there will always be one label in the arg tuple
                 c.setLabel(defaultL)
 
+    def setPolygon(self,site,p,fc=None,sc=None):
+        poly=self.getPolyFromSite(site)
+        if poly is None:
+            self.addPoly(site,p,fc,sc)
+        else:
+            poly.setPolygon(p)
+            if fc is not None:
+                poly.setFillColor(fc)
+            if sc is not None:
+                poly.setSiteColor(sc)
+
 
 class DrawModes(Enum):
     """Enumeration for the different interaction modes in the Voronoi diagram.
@@ -289,6 +300,11 @@ class VoronoiController:
         self.regenerateVoronoi()
         self.updatePolys()
         self.updateCanvas()
+
+    def grabCorrectLabel(self, label):
+        for lbl in self.label_model.get_all_labels():
+            if lbl == label: return lbl
+        return None
 
     def setCanvasSize(self, dimX, dimY):
         """Update the canvas dimensions and bounding area.

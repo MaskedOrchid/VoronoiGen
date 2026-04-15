@@ -1,6 +1,8 @@
+from operator import truediv
+
 from PySide6.QtWidgets import QDialog, QApplication
 
-from Apps import (HomeView, CreationModel, CreationView, MainApp)
+from Apps import (HomeView, CreationModel, CreationView, MainApp, Parser)
 
 import sys
 
@@ -15,6 +17,7 @@ class HomeController():
 
         self.model = CreationModel.CreationModel()
         self.w = None
+        self.parser = Parser.Parser()
 
     def open_dialog(self):
         dialog = CreationView.CreationDialog(self)
@@ -25,6 +28,12 @@ class HomeController():
 
     def exit_app(self):
         self.view.close()
+
+    def setFile(self, value):
+        if value != "":
+            self.model.changeFile(value)
+            return True
+        return False
 
     # Takes in input from the CreationView and updates the CreationModel accordingly
     def alterModel(self, title = "", width = "", height = ""):
@@ -44,6 +53,12 @@ class HomeController():
 
 
     def initializeMainApp(self):
+
+        if self.model.file != "":
+            self.parser.parse(self.model.file)
+            self.model.labels = self.parser.labels
+            self.model.packages = self.parser.packages
+
         self.w = MainApp.MainWindow(self.model)
         self.w.show()
         self.view.close()
