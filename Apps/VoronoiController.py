@@ -541,7 +541,7 @@ class VoronoiController:
             if site is not None:
                 self.assignCellToLabel(site)
                 self.assignLabelToCell(site)
-                self.cell_dialog = CellDialog.CellCustomizationDialog(self, p)
+                self.cell_dialog = CellDialog.CellCustomizationDialog(self, site)
                 self.cell_dialog.exec()
                 # Render the updated canvas
                 self.updateCanvas()
@@ -705,18 +705,18 @@ class VoronoiController:
         self.data.cleanupCellLabels(self.label_model.get_default_label(),args)
         self.updateCanvas()
 
-    def acceptCellDialogChanges(self, label, x, y):
+    def acceptCellDialogChanges(self, site, label, x, y):
         """Handles accepting the Cell Dialog changes
 
         Sets the label, and the new position of the site.
 
         Args:
+            site: The original site
             label: The cell's label
             x: the new x coord
             y: the new y coord
         """
         #replacing the old point with the new point
-        site = self.data.findSiteContainPoint(Point(x, y))
         self.data.setSite(site,Point(x, y))
 
         self.regenerateVoronoi()

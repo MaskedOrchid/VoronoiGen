@@ -109,12 +109,11 @@ class MainWindow(QMainWindow):
 
 
     def setUpLabels(self):
-        """Initialize label settings (placeholder)."""
-        self.voroController.setLabelModel(self.label_model)
         for label in self.model.getLabels():
             if label.getName() == "Default":
                 continue
             self.label_model.AddOldLabel(label)
+        self.voroController.setLabelModel(self.label_model)
 
     def setUpParser(self):
         """Initialize parser (placeholder)."""

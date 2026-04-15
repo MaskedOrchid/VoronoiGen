@@ -5,6 +5,8 @@ from PySide6.QtWidgets import (
     QLineEdit, QDialog, QColorDialog, QFrame
 )
 
+from Apps.Label import Label
+
 class Ui_CellCustomizationDialog(object):
     def setupUi(self, CellCustomizationDialog):
         if not CellCustomizationDialog.objectName():
@@ -91,10 +93,13 @@ class Ui_CellCustomizationDialog(object):
 
 class CellCustomizationDialog(QDialog):
 
-    def __init__(self, controller, p):
+    def __init__(self, controller, site):
         super().__init__()
         self.controller = controller
-        self.poly = p
+
+        self.site = site
+        self.poly = self.controller.getData().getPolyFromSite(site)
+
 
 
         self.ui = Ui_CellCustomizationDialog()
@@ -109,19 +114,19 @@ class CellCustomizationDialog(QDialog):
 
         self.ui.dropdown.clear()
         labels = list(map(lambda label: label.Name, controller.label_model.get_all_labels()))
-        self.ui.dropdown.addItem("")
+        self.ui.dropdown.addItem("(Create New Label)")
         self.ui.dropdown.addItems(labels)
 
         self.selectedLabel = ""
-        self.fillColor = p.FillColor
-        self.siteColor = p.SiteColor
-        self.xPos = p.Site.x
-        self.yPos = p.Site.y
+        self.fillColor = self.poly.getLabel().getFillColor()
+        self.siteColor = self.poly.getLabel().getSiteColor()
+        self.xPos = self.site.x
+        self.yPos = self.site.y
 
         self.ui.xInput.setText(str(self.xPos))
         self.ui.yInput.setText(str(self.yPos))
 
-        label = controller.label_model.get_label_with_site(p.Site)
+        label = self.poly.getLabel()
         if label:
             self.ui.dropdown.setCurrentText(label.Name)
             self.selectedLabel = label.Name
@@ -129,7 +134,7 @@ class CellCustomizationDialog(QDialog):
     def changeLabel(self, name):
 
         if name == "":
-            self.selectedLabel = ""
+            self.selectedLabel = "(Create New Label)"
             return
 
         labels = self.controller.label_model.get_all_labels()
@@ -147,8 +152,8 @@ class CellCustomizationDialog(QDialog):
         color = self.dialog.getColor()
         if color.isValid():
             if self.fillColor != color :
-                self.selectedLabel = ""
-                self.ui.dropdown.setCurrentText("")
+                self.selectedLabel = "(Create New Label)"
+                self.ui.dropdown.setCurrentText("(Create New Label)")
                 self.fillColor = color
                 self.ui.cellColorFrame.setStyleSheet(
                     f"background-color: {color.name()}; border: 1px solid black;")
@@ -158,8 +163,8 @@ class CellCustomizationDialog(QDialog):
         color = self.dialog2.getColor()
         if color.isValid():
             if self.siteColor != color :
-                self.selectedLabel = ""
-                self.ui.dropdown.setCurrentText("")
+                self.selectedLabel = "(Create New Label)"
+                self.ui.dropdown.setCurrentText("(Create New Label)")
                 self.siteColor = color
                 self.ui.siteColorFrame.setStyleSheet(
                     f"background-color: {color.name()}; border: 1px solid black;")
@@ -174,11 +179,13 @@ class CellCustomizationDialog(QDialog):
             return
 
         label = None
-        if self.selectedLabel == "":
-            label = None
+        if self.selectedLabel == "(Create New Label)":
+            label = Label(f"group{len(self.controller.label_model.get_all_labels()) + 1}", self.fillColor, self.siteColor)
+            self.controller.label_model.AddOldLabel(label)
         else:
             labels = self.controller.label_model.get_all_labels()
             label = next(lbl for lbl in labels if lbl.getName() == self.selectedLabel)
 
-        self.controller.acceptCellDialogChanges(self.poly, label, self.fillColor, self.siteColor, self.xPos, self.yPos)
+       # newLabel = Label()
+        self.controller.acceptCellDialogChanges(self.site, label, self.xPos, self.yPos)
         super().accept()
