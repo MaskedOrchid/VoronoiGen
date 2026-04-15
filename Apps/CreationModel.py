@@ -29,6 +29,9 @@ class CreationModel:
     def height(self):
         return self.canvasHeight
 
+    def getLabels(self):
+        return self.labels
+
     def changeFile(self, newFile):
         self.file = newFile
 

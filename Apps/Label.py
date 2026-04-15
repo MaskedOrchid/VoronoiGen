@@ -2,10 +2,10 @@ from PySide6.QtGui import QColor
 
 
 class Label:
-    def __init__(self, name="", color = QColor(255,255,255)):
+    def __init__(self, name="", fill = QColor(255,255,255), site = QColor(0,0,0)):
         self.Name = name
-        self.FillColor = color
-        self.SiteColor = QColor(0, 0, 0)
+        self.FillColor = fill
+        self.SiteColor = site
         self.Sites = []
 
     def setFillColor(self, color):

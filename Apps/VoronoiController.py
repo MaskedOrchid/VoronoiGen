@@ -730,3 +730,12 @@ class VoronoiController:
 
         self.updateCanvas()
 
+    def exportToNoi(self, filepath, window):
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write("canvas_x,canvas_y,name,x,x,\n")
+            f.write(f"{self.getCanvas.getCanvasSize()[0]},{self.getCanvas.getCanvasSize()[0]},{window},\n")
+            f.write("x-coordinate,y-coordinate,label title,cell color\n")
+            controller = self.getData()
+            for site in controller.getSites():
+                label = controller.getCell(site).getLabel()
+                f.write(f"{site.x},{site.y},{label.getName()},{label.getFillColor().name()},{label.getSiteColor().name()}\n")

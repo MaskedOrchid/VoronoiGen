@@ -66,8 +66,8 @@ class MainWindow(QMainWindow):
         #setting up UI and classes
 
         self.setUpMenuBar()
-        self.setUpVoronoi(self.width, self.height)
         self.setUpLabels()
+        self.setUpVoronoi(self.width, self.height)
         self.setUpParser()
         self.setUpLayouts()
 
@@ -105,13 +105,16 @@ class MainWindow(QMainWindow):
 
     def setUpVoronoi(self, cx, cy):
         """Configure the Voronoi controller and connect it to the label model."""
-        self.voroController.setLabelModel(self.label_model)
         self.voroController.setUpFromModel(self.model.packages)
 
 
     def setUpLabels(self):
         """Initialize label settings (placeholder)."""
-        pass
+        self.voroController.setLabelModel(self.label_model)
+        for label in self.model.getLabels():
+            if label.getName() == "Default":
+                continue
+            self.label_model.AddOldLabel(label)
 
     def setUpParser(self):
         """Initialize parser (placeholder)."""
@@ -165,8 +168,17 @@ class MainWindow(QMainWindow):
         print("Open Project")
 
     def saveProject(self):
-        """Save the current project (placeholder)."""
-        print("Saving Project")
+
+        dialog = QFileDialog(self)
+        dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
+        dialog.setNameFilters(["VoronoiGen File (*.noi)"])
+        dialog.setDefaultSuffix("noi")
+
+        if dialog.exec():
+            filepath = dialog.selectedFiles()[0]
+            if filepath:
+                self.voroController.exportToNoi(filepath, self.windowTitle())
+                print(f"Diagram exported to: {filepath}")
 
     def exportDiagram(self):
         """Export the Voronoi diagram as an image."""

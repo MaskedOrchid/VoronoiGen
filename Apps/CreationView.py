@@ -173,7 +173,11 @@ class Ui_CreationView(object):
         self.label_2.setText(QCoreApplication.translate("CreationView", u"Canvas Height", None))
     # retranslateUi
 
-
+class NoiDialog(QFileDialog):
+    def __init__(self, controller):
+        super().__init__()
+        self.filename = self.getOpenFileName(self, caption="Open Existing Project", filter="VoronoiGen Files (*.noi)")
+        controller.noiParser(self.filename[0])
 
 class CreationDialog(QDialog):
     def __init__(self, controller):
@@ -201,7 +205,7 @@ class CreationDialog(QDialog):
         self.controller.setFile("")
 
     def open_file_dialog(self):
-        filename = self.dialog.getOpenFileName(self, caption="Open Data File", filter="CSV Files (*.csv)")
+        filename = self.dialog.getOpenFileName(self, caption="Open Data File", filter="CSV Files (*.csv);;Excel Files (*.xlsx *.xls *.xlsm *.xlsb *.odf *.ods *.odt)")
         if not filename:
             self.ui.label_3.setText("No File Selected.")
             self.controller.setFile("")

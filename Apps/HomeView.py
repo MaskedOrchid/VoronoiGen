@@ -62,9 +62,7 @@ class MainWindow(QMainWindow):
         self.openButton = QPushButton('Open Project')
         self.openButton.setFixedSize(300, 70)
         self.openButton.setStyleSheet(self.grabber.grabStyle(Styles.GREENBUTTON))
-
-        # TODO: Implement custom project filetype and project saving.
-        self.openButton.clicked.connect(self.homeController.open_dialog)
+        self.openButton.clicked.connect(self.homeController.openNoiDialog)
 
         # -=-=-=- Exit Program Button -=-=-=-
         self.exitButton = QPushButton('Exit')

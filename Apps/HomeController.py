@@ -1,5 +1,3 @@
-from operator import truediv
-
 from PySide6.QtWidgets import QDialog, QApplication
 
 from Apps import (HomeView, CreationModel, CreationView, MainApp, Parser)
@@ -22,9 +20,6 @@ class HomeController():
     def open_dialog(self):
         dialog = CreationView.CreationDialog(self)
         dialog.exec()
-
-    #   TO DO: Implement opening existing project files.
-    #   def open_existing(self, checked):
 
     def exit_app(self):
         self.view.close()
@@ -53,8 +48,8 @@ class HomeController():
 
 
     def initializeMainApp(self):
-
         if self.model.file != "":
+            self.parser = Parser.create_parser(self.model.file)
             self.parser.parse(self.model.file)
             self.model.labels = self.parser.labels
             self.model.packages = self.parser.packages
@@ -63,8 +58,27 @@ class HomeController():
         self.w.show()
         self.view.close()
 
+    def openNoiDialog(self):
+        noi_dialog = CreationView.NoiDialog(self)
+
+    def noiParser(self, filepath):
+        if(filepath != ""):
+            self.setFile(filepath)
+            self.parser = Parser.NoiParser()
+            self.parser.parse(filepath)
+            self.alterModel(self.parser.title, str(self.parser.cx), str(self.parser.cy))
+            self.model.labels = self.parser.labels
+            self.model.packages = self.parser.packages
+
+            self.w = MainApp.MainWindow(self.model)
+            self.w.show()
+            self.view.close()
+            return
+        return
+
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-
     hc = HomeController()
     sys.exit(app.exec())
+
