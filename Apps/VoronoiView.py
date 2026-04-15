@@ -16,7 +16,6 @@ class VoronoiView(QWidget):
     Manages canvas rendering, site and cell visualization, user mouse interactions,
     and updates to the Voronoi diagram.
     """
-    
     def __init__(self, voronoicontroller, dimX, dimY):
         """
         Initialize the Voronoi view with specified dimensions.
@@ -45,8 +44,14 @@ class VoronoiView(QWidget):
         self.Image.fill(self.BG)
 
         # Initialize pen and brush for drawing operations
+        self.LineColor = QColor(0, 0, 0)
+        self.LineThickness = 10
+        self.SiteSize = 5
         self.Pen = QPen()
         self.Brush = QBrush(Qt.SolidPattern)
+
+        self.Pen.setWidthF(self.LineThickness)
+
 
     def getCanvasSize(self):
         """
@@ -89,25 +94,27 @@ class VoronoiView(QWidget):
         """
         # Create painter for drawing on the image buffer
         painter = QPainter(self.Image)
-        
         # Retrieve all polygons from the Voronoi data
-        polys = self.voro.getData().getPolys()
+        sites= self.voro.getData().getSites()
 
-        # Draw a colored circle at each site location
-        for p in polys:
-            sitepoint = p.getSite()
-            # Set pen and brush to the site's color
-            if p.getSiteColor() is None:
-                self.Brush.setColor(QColor(0,0,0))
+        # Draw a colored dot at each site location
+        for s in sites:
+            cell=self.voro.getData().getCell(s)
+            label=cell.getLabel()
+            if label is None:
+                print(("found None Label"))
+                self.Brush.setColor(QColor(255,255,255))
                 self.Pen.setColor(QColor(0,0,0))
             else:
-                self.Brush.setColor(p.getSiteColor())
-                self.Pen.setColor(p.getSiteColor())
+                # Set pen and brush to the site's color
+                self.Brush.setColor(label.getSiteColor())
+                self.Pen.setColor(label.getSiteColor())
+
 
             painter.setPen(self.Pen)
             painter.setBrush(self.Brush)
             # Draw small circle (radius of 3 pixels) at site point
-            painter.drawEllipse(QPointF(sitepoint.x, sitepoint.y), 3, 3)
+            painter.drawEllipse(QPointF(s.x, s.y),self.SiteSize,self.SiteSize)
 
         # Finish painting and update the widget display
         painter.end()
@@ -123,34 +130,34 @@ class VoronoiView(QWidget):
         # Create painter for drawing on the image buffer
         painter = QPainter(self.Image)
         # Retrieve all polygons from the Voronoi data
-        polys = self.voro.getData().getPolys()
+        cells = self.voro.getData().getCells()
 
         # Clear canvas with background color
         self.Image.fill(self.BG)
 
         # Draw each Voronoi cell polygon
-        for p in polys:
+        for c in cells:
             # Set the fill color for this cell
-            if p.getFillColor() is None:
-                self.Brush.setColor(QColor(255,255,255))
+            label=c.getLabel()
+
+            if label is None:
+                print(("found None Label"))
+                self.Brush.setColor(QColor(255, 255, 255))
             else:
-                self.Brush.setColor(p.getFillColor())
+                self.Brush.setColor(label.getFillColor())
 
             # Determine line color: either user-specified or match cell fill color
             if self.voro.getLineToggle():
                 # Use controller's line color setting if enabled
-                self.Pen.setColor(self.voro.getLineColor())
+                self.Pen.setColor(self.LineColor)
             else:
                 # Otherwise use the cell's fill color (invisible borders)
-                if p.getFillColor() is None:
-                    self.Pen.setColor(QColor(255, 255, 255))
-                else:
-                    self.Pen.setColor(p.getFillColor())
+                self.Pen.setColor(label.getFillColor())
 
             painter.setPen(self.Pen)
             painter.setBrush(self.Brush)
             # Draw the filled polygon representing the Voronoi cell
-            painter.drawPolygon(p.getPolygon())
+            painter.drawPolygon(c.getPolygon())
 
         # Finish painting and update the widget display
         painter.end()
@@ -199,4 +206,46 @@ class VoronoiView(QWidget):
         Args:
             t: Thickness value (float) in pixels for the pen stroke width
         """
+        self.LineThickness=t
         self.Pen.setWidthF(t)
+
+    def setLineColor(self, c):
+        """Set the color for drawing cell borders.
+
+        Args:
+            c: QColor for the lines
+        """
+        self.LineColor = c
+
+    def setSiteSize(self, s):
+        """
+        Set the size of the site dots used for drawing cell borders.
+
+        Args:
+            s: radius value (float) in pixels for the site dots
+        """
+        self.SiteSize = s
+
+    def getLineColor(self):
+        """Get the current line color.
+
+        Returns:
+            QColor: The color of cell borders
+        """
+        return self.LineColor
+
+    def getLineThickness(self):
+        """Get the current line thickness for cell borders.
+
+        Returns:
+            int: The thickness in pixels
+        """
+        return self.LineThickness
+
+    def getSiteSize(self):
+        """Get the current site size
+
+        Returns:
+            int: The radius in pixels
+        """
+        return self.SiteSize
