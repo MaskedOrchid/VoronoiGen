@@ -2,7 +2,7 @@ from PySide6.QtGui import QColor
 
 
 class Label:
-    def __init__(self, name=""):
+    def __init__(self, name="", color = QColor(255,255,255)):
         self.Name = name
         self.FillColor = color
         self.SiteColor = QColor(0, 0, 0)

@@ -106,7 +106,7 @@ class MainWindow(QMainWindow):
     def setUpVoronoi(self, cx, cy):
         """Configure the Voronoi controller and connect it to the label model."""
         self.voroController.setLabelModel(self.label_model)
-        self.voroController.setUpFromModel(self.model.labels, self.model.packages)
+        self.voroController.setUpFromModel(self.model.packages)
 
 
     def setUpLabels(self):
