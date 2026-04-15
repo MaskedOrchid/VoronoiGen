@@ -19,17 +19,6 @@ excel_set = {".xls", ".xlsx", ".xlsm", ".xlsb", ".odf", ".ods", ".odt"}
     Returns:
         Parser: A subtype of the Parser class.
  """
-def create_parser(filepath : str) -> Parser:
-    filename, file_extension = os.path.splitext(filepath)
-
-    if file_extension == ".csv":
-        return CsvParser()
-    elif file_extension in excel_set:
-        return ExcelParser()
-    elif file_extension == ".noi":
-        return NoiParser()
-
-    return CsvParser()
 
 # xls, xlsx, xlsm, xlsb, odf, ods and odt
 
@@ -163,3 +152,16 @@ class NoiParser(Parser):
 
                 except(ValueError, KeyError):
                     continue
+
+
+def create_parser(filepath : str) -> Parser:
+    filename, file_extension = os.path.splitext(filepath)
+
+    if file_extension == ".csv":
+        return CsvParser()
+    elif file_extension in excel_set:
+        return ExcelParser()
+    elif file_extension == ".noi":
+        return NoiParser()
+
+    return CsvParser()

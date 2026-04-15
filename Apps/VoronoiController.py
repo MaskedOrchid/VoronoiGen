@@ -383,11 +383,13 @@ class VoronoiController:
         l=None
         # Add site to the currently selected label.
         if self.label_model is not None:
-            self.label_model.add_site_to_label(newsite)
+
             if self.label_model.get_selected_label() is None:
                 l=self.label_model.get_default_label()
+                self.label_model.add_site_to_label(newsite,self.label_model.get_selected_label())
             else:
                 l=self.label_model.get_selected_label()
+                self.label_model.add_site_to_selected_label(newsite)
         # Add site to the data model
         return self.data.addSite(newsite,l)
 
@@ -470,20 +472,21 @@ class VoronoiController:
             self.data.setCell(site,polygon)
             i += 1
 
-    def assignCellToLabel(self, site):
+    def assignCellToLabel(self, site, label):
         """Assign a cell to a label in the label model.
         
         Removes the site from all current labels and assigns it to the selected label.
         
         Args:
             site: Shapely Point representing the site to assign
+            label: the Label that the cell needs to be assigned too
         """
         if self.label_model is None:
             return
         # Remove site from all current labels
         self.label_model.remove_site_from_all_labels(site)
         # Add site to the currently selected label
-        self.label_model.add_site_to_label(site)
+        self.label_model.add_site_to_label(site,label)
 
     def assignLabelToCell(self, site):
         """Assign a label's colors to a cell at the given position.
@@ -539,7 +542,6 @@ class VoronoiController:
             # Select mode: assign cell to a label and update its colors
             site = self.data.findSiteContainPoint(pos)
             if site is not None:
-                self.assignCellToLabel(site)
                 self.assignLabelToCell(site)
                 self.cell_dialog = CellDialog.CellCustomizationDialog(self, site)
                 self.cell_dialog.exec()
@@ -725,7 +727,7 @@ class VoronoiController:
         if site is None:
             return
         else:
-            self.assignCellToLabel(site)
+            self.assignCellToLabel(site,label)
             self.data.setLabel(site, label)
 
         self.updateCanvas()

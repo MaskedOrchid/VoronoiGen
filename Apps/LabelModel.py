@@ -63,10 +63,15 @@ class LabelModel(QObject):
     def get_selected_label(self):
         return self.selected_label
 
-    def add_site_to_label(self,site):
+    def add_site_to_selected_label(self,site):
         if self.selected_label is not None:
             self.selected_label.addSite(site)
             self.label_updated.emit(self.selected_label)
+
+    def add_site_to_label(self,site, label):
+        if label is not None:
+            label.addSite(site)
+            self.label_updated.emit(label)
 
     def get_label_with_site(self,site):
         for l in self.labels:
