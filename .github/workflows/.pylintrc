@@ -1,0 +1,12 @@
+[MASTER]
+load-plugins=
+
+[BASIC]
+# Enforce camelCase for functions (e.g., myFunctionName)
+function-rgx=^[a-z]+(?:[A-Z][a-z0-9]*)*$
+
+# Enforce ALL_CAPS for class names (e.g., MYCLASS)
+class-rgx=^[A-Z_]+$
+
+# Optional: allow normal variable naming or tweak as needed
+variable-rgx=^[a-z_][a-z0-9_]*$
