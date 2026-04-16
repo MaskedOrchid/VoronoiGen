@@ -49,7 +49,7 @@ class MainWindow(QMainWindow):
             self.height = height
 
         self.setMinimumSize(1200, 700)
-        self.showFullScreen()
+        self.showMaximized()
         self.menu = self.menuBar()
 
         #Voronoi Controller
