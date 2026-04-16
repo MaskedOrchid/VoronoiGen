@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QDialog, QApplication
+from PySide6.QtWidgets import QDialog, QApplication, QMessageBox, QWidget
 
 from Apps import (HomeView, CreationModel, CreationView, MainApp, Parser)
 
@@ -39,7 +39,7 @@ class HomeController():
             intedWidth = int(width)
             intedHeight = int(height)
         except ValueError:
-            print("Width and height must be numbers!")
+            QMessageBox.critical(QWidget(), "Error", "Invalid canvas dimensions given.")
             return False
 
         self.model.changeWidth(intedWidth)

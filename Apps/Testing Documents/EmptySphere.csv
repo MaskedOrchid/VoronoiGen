@@ -1,0 +1,21 @@
+x-coordinate,y-coordinate,label title,cell color
+250,57,Sphere,FFFFFF
+310,67,Sphere,FFFFFF
+363,94,Sphere,FFFFFF
+406,137,Sphere,FFFFFF
+433,190,Sphere,FFFFFF
+443,250,Sphere,FFFFFF
+433,310,Sphere,FFFFFF
+406,363,Sphere,FFFFFF
+363,406,Sphere,FFFFFF
+310,433,Sphere,FFFFFF
+250,443,Sphere,FFFFFF
+190,433,Sphere,FFFFFF
+137,406,Sphere,FFFFFF
+94,363,Sphere,FFFFFF
+67,310,Sphere,FFFFFF
+57,250,Sphere,FFFFFF
+67,190,Sphere,FFFFFF
+94,137,Sphere,FFFFFF
+137,94,Sphere,FFFFFF
+190,67,Sphere,FFFFFF

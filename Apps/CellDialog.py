@@ -2,7 +2,7 @@ from PySide6.QtCore import (QCoreApplication, QMetaObject, QRect, Qt)
 from PySide6.QtGui import (QFont, QColor)
 from PySide6.QtWidgets import (
     QDialogButtonBox, QLabel, QComboBox, QPushButton,
-    QLineEdit, QDialog, QColorDialog, QFrame
+    QLineEdit, QDialog, QColorDialog, QFrame, QMessageBox, QWidget
 )
 
 from Apps.Label import Label
@@ -183,6 +183,19 @@ class CellCustomizationDialog(QDialog):
             self.yPos = float(self.ui.yInput.text())
         except ValueError:
             return
+
+        if(self.xPos > self.controller.getCanvas.getCanvasSize()[0] or
+                self.yPos > self.controller.getCanvas.getCanvasSize()[1]):
+            QMessageBox.critical(QWidget(), "Error", "Invalid site position given.")
+            return
+
+        count = 0
+        for site in self.controller.getData().getSites():
+            print(f"{site.x},{site.y}")
+            if abs(self.xPos - site.x) <= 0.0001 and abs(self.yPos - site.y) <= 0.0001 and site is not self.site:
+                QMessageBox.critical(QWidget(), "Error", "Degenerate site position given.")
+                return
+
 
         label = None
         if self.selectedLabel == "(Create New Label)":
