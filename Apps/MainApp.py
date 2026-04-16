@@ -18,6 +18,7 @@ from Apps.VoronoiController import VoronoiController
 from Apps.CanvasTools import CanvasTools
 from Apps.LabelView import LabelView
 from Apps.CreationModel import CreationModel
+from Apps.CanvasOptions import CanvasOptions
 
 
 
@@ -59,8 +60,8 @@ class MainWindow(QMainWindow):
         self.label_model = self.label_view.get_model()
         #Toolbar
         self.toolBar=CanvasTools(self.voroController)
-        #Canvas options
-        self.canvasOptions=None
+        #Canvas Options
+        self.canvasOptions = CanvasOptions(self.voroController)
         #Parser
 
         #setting up UI and classes
@@ -126,6 +127,7 @@ class MainWindow(QMainWindow):
         tool_layout.setSpacing(15)
         tool_layout.setContentsMargins(10, 10, 10, 10)
         tool_layout.addWidget(self.toolBar)
+        tool_layout.addWidget(self.canvasOptions)
 
         # Add scrollable label view to sidebar
         scroll = QScrollArea()
