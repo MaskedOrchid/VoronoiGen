@@ -11,4 +11,4 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install pylint
-      - run: pylint --rcfile=.pylintrc $(git ls-files '*.py')
+      - run: pylint --rcfile=.github/workflows/.pylintrc $(git ls-files '*.py')
