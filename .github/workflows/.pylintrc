@@ -7,5 +7,5 @@ class-rgx=^[A-Z_]+$
 variable-rgx=^[a-z_][a-z0-9_]*$
 
 # IMPORTANT: override naming style system
-function-naming-style=camelCase
-class-naming-style=UPPER_CASE
+function-naming-style="camelCase"
+class-naming-style="UPPER_CASE"
