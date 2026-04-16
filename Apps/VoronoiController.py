@@ -285,7 +285,7 @@ class VoronoiController:
         self.label_model = None
         self.cell_dialog = None
 
-    def setUpFromModel(self,packages):
+    def setUpFromModel(self,packages,options):
         """Creates the Voronoi Diagram from parsed data.
 
         Args:
@@ -295,7 +295,12 @@ class VoronoiController:
             self.addSite([package.xPosition, package.yPosition])
             site = self.data.getSites()[-1]
             self.data.setLabel(site,package.label)
-            self.assignCellToLabel(site)
+            self.assignCellToLabel(site, package.label)
+
+        self.toggleLines(options.lineToggle)
+        self.toggleSites(options.siteToggle)
+        self.setLineColor(QColor(options.lineColor))
+        self.setLineThickness(options.lineWeight)
 
         self.regenerateVoronoi()
         self.updatePolys()
@@ -586,7 +591,7 @@ class VoronoiController:
         Args:
             s: bool - True to show sites, False to hide them
         """
-        self.SitesEnabled = s
+        self.SitesEnabled = bool(s)
         self.updateCanvas()
 
     def setSiteSize(self, s):
@@ -723,10 +728,11 @@ class VoronoiController:
 
         self.regenerateVoronoi()
         self.updatePolys()
-
+        site = self.data.findSiteContainPoint([x,y])
         if site is None:
             return
         else:
+
             self.assignCellToLabel(site,label)
             self.data.setLabel(site, label)
 
@@ -734,8 +740,10 @@ class VoronoiController:
 
     def exportToNoi(self, filepath, window):
         with open(filepath, 'w', encoding='utf-8') as f:
-            f.write("canvas_x,canvas_y,name,x,x,\n")
-            f.write(f"{self.getCanvas.getCanvasSize()[0]},{self.getCanvas.getCanvasSize()[0]},{window},\n")
+            f.write("canvas_x,canvas_y,name,line_toggle,line_color,line_weight,site_toggle\n")
+            f.write(f"{self.getCanvas.getCanvasSize()[0]},{self.getCanvas.getCanvasSize()[0]},{window},"
+                    f"{int(self.getLineToggle())},{self.getLineColor().name()},{self.getLineThickness()},"
+                    f"{int(self.getSiteToggle())}\n")
             f.write("x-coordinate,y-coordinate,label title,cell color\n")
             controller = self.getData()
             for site in controller.getSites():

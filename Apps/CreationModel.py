@@ -1,6 +1,14 @@
 
 # TODO: Add and implement parsed file information, background image, custom filetype, etc.
 # Model for converting data from the CreationView into the Main Application and Canvas.
+class OptionsModel:
+
+    def __init__(self):
+        self.lineToggle = 1
+        self.lineWeight = 10.0
+        self.lineColor = "#000000"
+        self.siteToggle = 1
+
 class CreationModel:
 
     def __init__(self, tt = "", cx = 0, cy = 0):
@@ -10,6 +18,16 @@ class CreationModel:
         self.file = ""
         self.labels = []
         self.packages = []
+        self.options = OptionsModel()
+
+    def setOptionsModel(self, lt, lw, lc, st):
+        self.options.lineToggle = lt
+        self.options.lineWeight = lw
+        self.options.lineColor = lc
+        self.options.siteToggle = st
+
+    def getOptions(self):
+        return self.options
 
     def changeName(self, newName):
         self.title = newName

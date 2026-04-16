@@ -42,15 +42,14 @@ class MainWindow(QMainWindow):
         self.model = creationModel
         if(creationModel):
             self.setWindowTitle(creationModel.getTitle())
-            self.width = creationModel.width()
-            self.height = creationModel.height()
+            self.width, self.height = self.clampCanvasSize(creationModel.width(),creationModel.height(), 800)
         else:
             self.setWindowTitle(name)
             self.width = width
             self.height = height
 
         self.setMinimumSize(1200, 700)
-
+        self.showFullScreen()
         self.menu = self.menuBar()
 
         #Voronoi Controller
@@ -75,13 +74,13 @@ class MainWindow(QMainWindow):
     def setUpMenuBar(self):
         """Create and configure the menu bar with File menu options."""
         # Create File menu actions
-        new_action = QAction("New Project", self)
-        new_action.setStatusTip("This creates a new Project")
-        new_action.triggered.connect(self.newProject)
+       # new_action = QAction("New Project", self)
+       # new_action.setStatusTip("This creates a new Project")
+       # new_action.triggered.connect(self.newProject)
 
-        open_action = QAction("Open Project", self)
-        open_action.setStatusTip("This Opens a Project")
-        open_action.triggered.connect(self.openProject)
+       # open_action = QAction("Open Project", self)
+       # open_action.setStatusTip("This Opens a Project")
+       # open_action.triggered.connect(self.openProject)
 
         save_action = QAction("Save Project", self)
         save_action.setStatusTip("This saves the current Project")
@@ -97,8 +96,8 @@ class MainWindow(QMainWindow):
 
         # Add actions to File menu
         file_menu = self.menu.addMenu("&File")
-        file_menu.addAction(new_action)
-        file_menu.addAction(open_action)
+       # file_menu.addAction(new_action)
+       # file_menu.addAction(open_action)
         file_menu.addAction(save_action)
         file_menu.addAction(export_action)
         file_menu.addAction(quit_action)
@@ -106,7 +105,8 @@ class MainWindow(QMainWindow):
 
     def setUpVoronoi(self, cx, cy):
         """Configure the Voronoi controller and connect it to the label model."""
-        self.voroController.setUpFromModel(self.model.packages)
+        self.voroController.setUpFromModel(self.model.packages, self.model.getOptions())
+        self.canvasOptions.renderText()
 
 
     def setUpLabels(self):
@@ -122,40 +122,62 @@ class MainWindow(QMainWindow):
 
     def setUpLayouts(self):
         """Construct the main UI layout with toolbar, canvas, and label panel."""
-        # Left sidebar with toolbar and labels
         tool_layout = QVBoxLayout()
         tool_layout.setSpacing(15)
         tool_layout.setContentsMargins(10, 10, 10, 10)
         tool_layout.addWidget(self.toolBar)
-        tool_layout.addWidget(self.canvasOptions)
 
-        # Add scrollable label view to sidebar
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.label_view)
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll.setMinimumHeight(400)
+
+
+
+
         tool_layout.addWidget(scroll)
         tool_layout.addStretch()
 
-        # Create left panel widget
         tool_panel = QWidget()
         tool_panel.setLayout(tool_layout)
         tool_panel.setMinimumWidth(350)
         tool_panel.setMaximumWidth(450)
 
-        # Main layout: sidebar + canvas
+        self.canvasOptions.setMinimumWidth(250)
+        self.canvasOptions.setMaximumWidth(350)
+
+        left_wrapper = QVBoxLayout()
+        left_wrapper.addStretch(1)
+        left_wrapper.addWidget(tool_panel)
+        left_wrapper.addStretch(1)
+
+        left_container = QWidget()
+        left_container.setLayout(left_wrapper)
+
+        right_wrapper = QVBoxLayout()
+        right_wrapper.addStretch(1)
+        right_wrapper.addWidget(self.canvasOptions)
+        right_wrapper.addStretch(1)
+
+        right_container = QWidget()
+        right_container.setLayout(right_wrapper)
+
         main_layout = QHBoxLayout()
         main_layout.setSpacing(20)
         main_layout.setContentsMargins(10, 10, 10, 10)
+
         content_layout = QHBoxLayout()
         content_layout.setSpacing(30)
-        content_layout.addWidget(tool_panel)
-        content_layout.addWidget(self.voroController.getCanvas)
 
+        content_layout.addWidget(left_container)
+        content_layout.addWidget(self.voroController.getCanvas, 1)  # canvas expands
+        content_layout.addWidget(right_container)
+
+        main_layout.addStretch(1)
         main_layout.addLayout(content_layout)
         main_layout.addStretch(1)
 
-        # Set central widget
         central = QWidget()
         central.setLayout(main_layout)
         self.setCentralWidget(central)
@@ -179,7 +201,6 @@ class MainWindow(QMainWindow):
             filepath = dialog.selectedFiles()[0]
             if filepath:
                 self.voroController.exportToNoi(filepath, self.windowTitle())
-                print(f"Diagram exported to: {filepath}")
 
     def exportDiagram(self):
         """Export the Voronoi diagram as an image."""
@@ -201,6 +222,11 @@ class MainWindow(QMainWindow):
                 else:
                     print(f"Failed to export diagram to: {file_path}")
 
+    def clampCanvasSize(self, x, y, mx):
+        scalar_x = mx / x if x > mx else 1.0
+        scalar_y = mx / y if y > mx else 1.0
+        scalar = min(scalar_x, scalar_y)
+        return x * scalar, y * scalar
 
 
 

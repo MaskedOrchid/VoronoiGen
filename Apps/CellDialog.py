@@ -138,11 +138,17 @@ class CellCustomizationDialog(QDialog):
             return
 
         labels = self.controller.label_model.get_all_labels()
-        label = next(lbl for lbl in labels if lbl.getName() == name)
+        try:
+            label = next(lbl for lbl in labels if lbl.getName() == name)
+        except StopIteration:
+            return
 
         self.fillColor = label.FillColor
+        self.siteColor = label.SiteColor
         self.ui.cellColorFrame.setStyleSheet(
             f"background-color: {label.FillColor.name()}; border: 1px solid black;")
+        self.ui.siteColorFrame.setStyleSheet(
+            f"background-color: {label.SiteColor.name()}; border: 1px solid black;")
         self.selectedLabel = label.getName()
 
 
@@ -182,9 +188,11 @@ class CellCustomizationDialog(QDialog):
         if self.selectedLabel == "(Create New Label)":
             label = Label(f"group{len(self.controller.label_model.get_all_labels()) + 1}", self.fillColor, self.siteColor)
             self.controller.label_model.AddOldLabel(label)
-        else:
+        elif self.selectedLabel != "Default":
             labels = self.controller.label_model.get_all_labels()
             label = next(lbl for lbl in labels if lbl.getName() == self.selectedLabel)
+        else:
+            label = self.controller.label_model.get_default_label()
 
        # newLabel = Label()
         self.controller.acceptCellDialogChanges(self.site, label, self.xPos, self.yPos)

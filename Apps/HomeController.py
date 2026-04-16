@@ -69,6 +69,8 @@ class HomeController():
             self.alterModel(self.parser.title, str(self.parser.cx), str(self.parser.cy))
             self.model.labels = self.parser.labels
             self.model.packages = self.parser.packages
+            self.model.setOptionsModel(self.parser.lineToggle, self.parser.lineThickness,
+                                       self.parser.lineColor, self.parser.siteToggle)
 
             self.w = MainApp.MainWindow(self.model)
             self.w.show()

@@ -103,6 +103,10 @@ class NoiParser(Parser):
         self.cx = 0
         self.cy = 0
         self.title = ""
+        self.lineToggle = 0
+        self.lineColor = "#000000"
+        self.lineThickness = 0.0
+        self.siteToggle = 0
 
     def parse(self, filepath):
         filedata = pd.read_csv(filepath, header=None, dtype=str)
@@ -110,9 +114,13 @@ class NoiParser(Parser):
         for row_num, (index, row) in enumerate(filedata.iterrows()):
 
             if row_num == 1:
-                self.cx = int(row[0])
-                self.cy = int(row[1])
+                self.cx = round(float(row[0]))
+                self.cy = round(float(row[1]))
                 self.title = str(row[2])
+                self.lineToggle = int(row[3])
+                self.lineColor = str(row[4])
+                self.lineThickness = float(row[5])
+                self.siteToggle = int(row[6])
             else:
                 try:
                     x = float(row[0])

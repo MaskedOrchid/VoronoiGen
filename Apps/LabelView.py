@@ -35,7 +35,8 @@ class LabelItemWidget(QWidget):
 
         # Name
         self.name_label = QLabel()
-        self.name_label.setMinimumWidth(80)
+        self.name_label.setMinimumWidth(30)
+        self.name_label.setMaximumWidth(60)
         self.name_label.setStyleSheet("font-weight: 500;")
         layout.addWidget(self.name_label)
 

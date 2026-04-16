@@ -139,17 +139,16 @@ class CanvasOptions(QWidget):
 
     def _toggle_lines(self):
         """Toggle cell border line visibility on/off."""
-        self.lines_on = not self.lines_on
+        self.lines_on = not self.voroController.getLineToggle()
         self.voroController.toggleLines(self.lines_on)
         self._update_line_toggle_btn_text()
 
     def _update_line_toggle_btn_text(self):
         """Refresh the line toggle button label to reflect current state."""
-        if self.lines_on:
+        if self.voroController.getLineToggle():
             self.line_toggle_btn.setText("Lines: ON")
         else:
             self.line_toggle_btn.setText("Lines: OFF")
-
     # ------------------------------------------------------------------ #
     #  VM-52: Line color changing
     # ------------------------------------------------------------------ #
@@ -209,13 +208,13 @@ class CanvasOptions(QWidget):
 
     def _toggle_sites(self):
         """Toggle site point visibility on/off."""
-        self.sites_on = not self.sites_on
+        self.sites_on = not self.voroController.getSiteToggle()
         self.voroController.toggleSites(self.sites_on)
         self._update_site_toggle_btn_text()
 
     def _update_site_toggle_btn_text(self):
         """Refresh the site toggle button label to reflect current state."""
-        if self.sites_on:
+        if self.voroController.getSiteToggle():
             self.site_toggle_btn.setText("Sites: ON")
         else:
             self.site_toggle_btn.setText("Sites: OFF")
@@ -263,3 +262,6 @@ class CanvasOptions(QWidget):
                 background-color: #1976d2;
             }
         """
+    def renderText(self):
+        self._update_line_toggle_btn_text()
+        self._update_site_toggle_btn_text()
