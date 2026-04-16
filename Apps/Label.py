@@ -1,23 +1,18 @@
-# Imports
 from PySide6.QtGui import QColor
-from VoronoiHandler import Poly
 
 
-# Label Class:
 class Label:
-
-    def __init__(self, name="", color=QColor(255, 255, 255)):
+    def __init__(self, name="", fill = QColor(255,255,255), site = QColor(0,0,0)):
         self.Name = name
+        self.FillColor = fill
+        self.SiteColor = site
+        self.Sites = []
+
+    def setFillColor(self, color):
         self.FillColor = color
-        self.SiteColor = QColor(0, 0, 0)
-        self.Sites = []  # List of Sites
-        self.Polys = []  # list of polygons
 
-    def setFillColor(self, C):
-        self.FillColor = C
-
-    def setSiteColor(self, S):
-        self.SiteColor = S
+    def setSiteColor(self, color):
+        self.SiteColor = color
 
     def getFillColor(self):
         return self.FillColor
@@ -28,21 +23,24 @@ class Label:
     def getName(self):
         return self.Name
 
-    def addSite(self, S):
-        if S not in self.Sites:  # Prevent duplicates
-            self.Sites.append(S)
+    def addSite(self, site):
+        if site not in self.Sites:
+            self.Sites.append(site)
 
-    def addPoly(self, P):
-        if P not in self.Polys:  # Prevent duplicates
-            self.Polys.append(P)
+    def getSites(self):
+        return self.Sites
 
-    def removeSite(self, S):
-        if S in self.Sites:
-            self.Sites.remove(S)
-
-    def removePoly(self, P):
-        if P in self.Polys:
-            self.Polys.remove(P)
+    def removeSite(self, site):
+        if site in self.Sites:
+            self.Sites.remove(site)
 
     def __str__(self):
+        return self.Name
+
+    def __eq__(self, other):
+        if other is None:
+            return False
+        return self.Name == other.getName()
+
+    def __neg__(self):
         return self.Name
