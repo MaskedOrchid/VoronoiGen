@@ -8,3 +8,4 @@ function-naming-style=camelCase
 class-naming-style=PascalCase
 variable-naming-style=any
 method-naming-style=camelCase
+argument-naming-style=any
