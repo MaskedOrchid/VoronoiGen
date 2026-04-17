@@ -5,7 +5,7 @@ from PySide6.QtWidgets import (
     QLineEdit, QDialog, QColorDialog, QFrame, QMessageBox, QWidget
 )
 
-from Apps.Label import Label
+from Apps.Label import LABEL
 
 class Ui_CellCustomizationDialog(object):
     def setupUi(self, CellCustomizationDialog):
@@ -98,7 +98,7 @@ class CellCustomizationDialog(QDialog):
         self.controller = controller
 
         self.site = site
-        self.poly = self.controller.getData().getPolyFromSite(site)
+        self.poly = self.controller.getData().getCellFromSite(site)
 
 
 
@@ -113,7 +113,7 @@ class CellCustomizationDialog(QDialog):
         self.dialog2 = QColorDialog()
 
         self.ui.dropdown.clear()
-        labels = list(map(lambda label: label.Name, controller.label_model.get_all_labels()))
+        labels = list(map(lambda label: label.Name, controller.label_model.getAllLabels()))
         self.ui.dropdown.addItem("(Create New Label)")
         self.ui.dropdown.addItems(labels)
 
@@ -137,7 +137,7 @@ class CellCustomizationDialog(QDialog):
             self.selectedLabel = "(Create New Label)"
             return
 
-        labels = self.controller.label_model.get_all_labels()
+        labels = self.controller.label_model.getAllLabels()
         try:
             label = next(lbl for lbl in labels if lbl.getName() == name)
         except StopIteration:
@@ -199,13 +199,13 @@ class CellCustomizationDialog(QDialog):
 
         label = None
         if self.selectedLabel == "(Create New Label)":
-            label = Label(f"group{len(self.controller.label_model.get_all_labels()) + 1}", self.fillColor, self.siteColor)
+            label = LABEL(f"group{len(self.controller.label_model.getAllLabels()) + 1}", self.fillColor, self.siteColor)
             self.controller.label_model.AddOldLabel(label)
         elif self.selectedLabel != "Default":
-            labels = self.controller.label_model.get_all_labels()
+            labels = self.controller.label_model.getAllLabels()
             label = next(lbl for lbl in labels if lbl.getName() == self.selectedLabel)
         else:
-            label = self.controller.label_model.get_default_label()
+            label = self.controller.label_model.getDefaultLabel()
 
        # newLabel = Label()
         self.controller.acceptCellDialogChanges(self.site, label, self.xPos, self.yPos)

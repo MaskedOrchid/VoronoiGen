@@ -7,16 +7,16 @@ Handles site management, diagram updates, and user interactions.
 import random
 from enum import Enum
 
-from PySide6.QtCore import Qt, QPointF, Signal
+from PySide6.QtCore import Qt, QPointF
 from PySide6.QtGui import QColor, QPolygonF
 from shapely import MultiPoint, Point
 from shapely import voronoi_polygons
 from shapely.creation import geometrycollections
 
-from Apps.VoronoiView import VoronoiView
-from Apps import CellDialog
+from VoronoiView import VORNOIVIEW
+import CellDialog
 
-class Cell:
+class CELL:
     """
     Represents a single Voronoi cell with its associated metadata.
     
@@ -31,7 +31,6 @@ class Cell:
         """Initialize a Poly object with site, polygon, and colors.
         
         Args:
-            s: Shapely Point representing the site
             p: QPolygonF representing the cell boundary
             l: a Label object representing the label associated to this cell
         """
@@ -69,7 +68,7 @@ class Cell:
 
 
 
-class VoronoiModel:
+class VORONOIMODEL:
     """
     Data model for Voronoi diagram.
     
@@ -95,7 +94,7 @@ class VoronoiModel:
         new_point = Point(newsite[0], newsite[1])
         if new_point in self.Sites:
             return False
-        self.Sites[new_point]=Cell(QPolygonF(),l)
+        self.Sites[new_point]=CELL(QPolygonF(),l)
         return True
 
     def removeSite(self, point):
@@ -137,8 +136,8 @@ class VoronoiModel:
         """Set a new polygon to a site
 
         Args:
-            s: Shapely Point for the site
-            p: QPolygonF for the cell's edges
+            oldsite: the former Shapely point
+            nsite: the new Shapely point to replace the old
         """
         c = self.Sites.get(oldsite)
         self.Sites.pop(oldsite)
@@ -174,7 +173,7 @@ class VoronoiModel:
         """Find the polygon containing the given point coordinates.
         
         Args:
-            site: [x, y] coordinates to try to find the closest site point
+            point: [x, y] coordinates to try to find the closest site point
             
         Returns:
             s: the cell's site that contains this point
@@ -187,7 +186,7 @@ class VoronoiModel:
                 return s
         return None
 
-    def getPolyFromSite(self, site):
+    def getCellFromSite(self, site):
         """Find the polygon associated with a given site.
         
         Args:
@@ -209,30 +208,20 @@ class VoronoiModel:
         """
         return self.Sites.get(site)
 
-    def cleanupCellLabels(self,defaultL,l):
+    def cleanUpCellLabels(self,defaultL,l):
         """Searches and replaces any cells with null label to the default label
 
         Args:
             defaultL: the default label
+            l: the label being removed
         """
         for c in  self.Sites.values():
             if c.getLabel() is None or c.getLabel()==l[0]:
                 #assumes that there will always be one label in the arg tuple
                 c.setLabel(defaultL)
 
-    def setPolygon(self,site,p,fc=None,sc=None):
-        poly=self.getPolyFromSite(site)
-        if poly is None:
-            self.addPoly(site,p,fc,sc)
-        else:
-            poly.setPolygon(p)
-            if fc is not None:
-                poly.setFillColor(fc)
-            if sc is not None:
-                poly.setSiteColor(sc)
 
-
-class DrawModes(Enum):
+class DRAWMODES(Enum):
     """Enumeration for the different interaction modes in the Voronoi diagram.
     
     Attributes:
@@ -245,7 +234,7 @@ class DrawModes(Enum):
     Remove = 3
 
 
-class VoronoiController:
+class VORONOICONTROLLER:
     """
     Main controller for the Voronoi diagram application.
     
@@ -263,14 +252,14 @@ class VoronoiController:
         # Shapely geometry collection for storing computed Voronoi polygons
         self.Voro = geometrycollections([])
         # Data model for managing sites and cells
-        self.data = VoronoiModel()
+        self.data = VORONOIMODEL()
         # Tolerance for degenerate data handling for sites being too close
         self.Tolerance = 0.001
 
         # View for rendering the diagram
-        self.can = VoronoiView(self, dimX, dimY)
+        self.can = VORNOIVIEW(self, dimX, dimY)
         # Current interaction mode (Add, Remove, or Select)
-        self.mode = DrawModes.Add
+        self.mode = DRAWMODES.Add
 
         # Display settings
         self.SitesEnabled = True       # Show/hide site points
@@ -307,8 +296,14 @@ class VoronoiController:
         self.updateCanvas()
 
     def grabCorrectLabel(self, label):
-        for lbl in self.label_model.get_all_labels():
-            if lbl == label: return lbl
+        """Finds the label that this cell uses
+
+            Args:
+                label: the label we are trying to find
+        """
+        for lbl in self.label_model.getAllLabels():
+            if lbl == label:
+                return lbl
         return None
 
     def setCanvasSize(self, dimX, dimY):
@@ -334,7 +329,8 @@ class VoronoiController:
         self.connectLabelSignals()
 
     def connectLabelSignals(self):
-
+        """Connects onLabelChange and onLabelRemove to label_model signals
+        """
 
         if self.label_model is not None:
             #connecting the label model signals to the related functions
@@ -389,12 +385,12 @@ class VoronoiController:
         # Add site to the currently selected label.
         if self.label_model is not None:
 
-            if self.label_model.get_selected_label() is None:
-                l=self.label_model.get_default_label()
-                self.label_model.add_site_to_label(newsite,self.label_model.get_selected_label())
+            if self.label_model.getSelectedLabel() is None:
+                l=self.label_model.getDefaultLabel()
+                self.label_model.addSiteToLabel(newsite,self.label_model.getSelectedLabel())
             else:
-                l=self.label_model.get_selected_label()
-                self.label_model.add_site_to_selected_label(newsite)
+                l=self.label_model.getSelectedLabel()
+                self.label_model.addSiteToSelectedLabel(newsite)
         # Add site to the data model
         return self.data.addSite(newsite,l)
 
@@ -411,7 +407,7 @@ class VoronoiController:
         """
         # Finding the closest site that will approximate which site needs to be removed
         s=self.data.findSiteContainPoint(pos)
-        self.label_model.remove_site_from_all_labels(s)
+        self.label_model.removeSiteFromAllLabels(s)
 
         return self.data.removeSite(pos)
 
@@ -489,9 +485,9 @@ class VoronoiController:
         if self.label_model is None:
             return
         # Remove site from all current labels
-        self.label_model.remove_site_from_all_labels(site)
+        self.label_model.removeSiteFromAllLabels(site)
         # Add site to the currently selected label
-        self.label_model.add_site_to_label(site,label)
+        self.label_model.addSiteToLabel(site,label)
 
     def assignLabelToCell(self, site):
         """Assign a label's colors to a cell at the given position.
@@ -505,7 +501,7 @@ class VoronoiController:
             return
 
         # Get the currently selected label
-        selected_label = self.label_model.get_selected_label()
+        selected_label = self.label_model.getSelectedLabel()
         if selected_label is None:
             return
 
@@ -525,14 +521,14 @@ class VoronoiController:
         Args:
             pos: [x, y] the mouse coordinates for the operation with in the Voronoi View widget
         """
-        if self.mode == DrawModes.Add:
+        if self.mode == DRAWMODES.Add:
             # Add mode: add a new site and regenerate the diagram
             if self.addSite(pos):
                 self.regenerateVoronoi()
                 self.updatePolys()
                 self.updateCanvas()
 
-        elif self.mode == DrawModes.Remove:
+        elif self.mode == DRAWMODES.Remove:
             # Remove mode: remove the site under the click position
             if self.removeSite(pos):
                 self.regenerateVoronoi()
@@ -543,7 +539,7 @@ class VoronoiController:
                 if len(self.data.getSites()) <= 0 and self.can:
                     self.clearCanvas()
 
-        elif self.mode == DrawModes.Select:
+        elif self.mode == DRAWMODES.Select:
             # Select mode: assign cell to a label and update its colors
             site = self.data.findSiteContainPoint(pos)
             if site is not None:
@@ -709,7 +705,7 @@ class VoronoiController:
         """Handles the removal of a label by correcting the data and setting the
         cells with invalid label back to the default label
         """
-        self.data.cleanupCellLabels(self.label_model.get_default_label(),args)
+        self.data.cleanUpCellLabels(self.label_model.getDefaultLabel(),args)
         self.updateCanvas()
 
     def acceptCellDialogChanges(self, site, label, x, y):
@@ -739,6 +735,12 @@ class VoronoiController:
         self.updateCanvas()
 
     def exportToNoi(self, filepath, window):
+        """Exports and packs the Voronoi Data into a noi file
+
+            Args:
+                filepath= the file path of the save file
+                window= window parameter
+            """
         with open(filepath, 'w', encoding='utf-8') as f:
             f.write("canvas_x,canvas_y,name,line_toggle,line_color,line_weight,site_toggle\n")
             f.write(f"{self.getCanvas.getCanvasSize()[0]},{self.getCanvas.getCanvasSize()[0]},{window},"

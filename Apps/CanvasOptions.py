@@ -15,7 +15,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
 
 
-class CanvasOptions(QWidget):
+class CANVASOPTIONS(QWidget):
     """
     A sidebar panel widget for controlling Voronoi canvas
     display options.

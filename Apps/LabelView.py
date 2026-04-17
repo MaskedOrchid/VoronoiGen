@@ -1,14 +1,35 @@
+"""
+Labelview Module
+Manages the Label's and label widget UI and visuals
+Handles label datas, passing labels and emitting signals
+"""
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QColorDialog,
-    QInputDialog, QMessageBox, QFrame
+    QInputDialog, QMessageBox,
 )
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QFont
-from Apps.LabelModel import LabelModel
+from Apps.LabelModel import LABELMODEL
 
 
 class LabelItemWidget(QWidget):
+    """
+    Represents a single label Item and it's UI
+
+    A widget class that manages updating and showing the labels visually.
+
+    Attributes:
+        label: the label to visualize
+        is_selected: whether this label item widget is selected
+
+    Signals:
+        edit_requested: the signal emitted when the item widget is trying to be edited
+        delete_requested: the signal emitted when the item widget is trying to be deleted
+        color_change_requested: the signal emitted when the item widget
+            is trying to change it's color
+        selected: the signal emitted when the item widget is selected
+    """
     edit_requested = Signal(object)
     delete_requested = Signal(object)
     color_change_requested = Signal(object)
@@ -16,6 +37,12 @@ class LabelItemWidget(QWidget):
 
     def __init__(self, label, parent=None):
         super().__init__(parent)
+        """Initialize a label item widget
+
+        Args:
+             label: label to represent
+             parent: the parent object of this label item widget
+        """
         self.label = label
         self.is_selected = False
         self.init_ui()
@@ -23,6 +50,8 @@ class LabelItemWidget(QWidget):
 
 
     def init_ui(self):
+        """Initialize the label item widget's UI layout
+        """
         layout = QHBoxLayout()
         layout.setContentsMargins(10, 8, 10, 8)
         layout.setSpacing(10)
@@ -88,14 +117,28 @@ class LabelItemWidget(QWidget):
         self.setLayout(layout)
 
     def mousePressEvent(self, event):
+        """handles when the label item widget receives a mouse event and selects this label
+        emitting the selected label signal
+
+        Args:
+             event: the mouse press event
+        """
         self.selected.emit(self.label)
         super().mousePressEvent(event)
 
     def set_selected(self, selected):
+        """Sets the is_selected bool
+
+        Args:
+             selected: a bool to set is_selected too
+        """
         self.is_selected = selected
         self.apply_style()
 
     def apply_style(self):
+        """Sets the label item widget to appear highlighted
+
+        """
         if self.is_selected:
             self.setStyleSheet("""
                 QWidget {
@@ -114,6 +157,9 @@ class LabelItemWidget(QWidget):
             """)
 
     def update_display(self):
+        """Updates the UI with current label information
+
+        """
         color = self.label.getFillColor()
         self.color_preview.setStyleSheet(
             f"background-color: rgb({color.red()}, {color.green()}, {color.blue()});"
@@ -123,26 +169,46 @@ class LabelItemWidget(QWidget):
         self.site_count.setText(f"Sites: {len(self.label.Sites)}")
 
 
-class LabelView(QWidget):
+class LABELVIEW(QWidget):
+    """
+        Represent Label view, handling the label systems visual view.
+
+        A widget class that manages updating and showing the label system visuals
+
+        Attributes:
+            model:label's model
+            item_widgets: the list of all the label item widgets
+
+        Signals:
+             labels_modified: the signals emitted when the labels are modified
+        """
     labels_modified = Signal()
 
     def __init__(self, model=None, parent=None):
         super().__init__(parent)
+        """Initalizes the label view object
 
-        self.model = model if model else LabelModel()
+        arg:
+            model: the label model/controller object
+            parent: the parent object for the label viewer object
+
+        """
+
+        self.model = model if model else LABELMODEL()
         self.item_widgets = []
 
         self.model.label_added.connect(self.refresh)
         self.model.label_removed.connect(self.refresh)
         self.model.label_updated.connect(self.refresh)
-        self.model.selection_changed.connect(self.update_selection_display)
+        self.model.selection_changed.connect(self.updateSelectionDisplay)
 
-        self.init_ui()
+        self.initUi()
         self.refresh()
 
+    def initUi(self):
+        """Initializes the UI of the Label View
 
-
-    def init_ui(self):
+        """
         main_layout = QVBoxLayout()
         main_layout.setContentsMargins(12, 12, 12, 12)
         main_layout.setSpacing(12)
@@ -160,7 +226,7 @@ class LabelView(QWidget):
                 background-color: #388e3c;
             }
         """)
-        self.add_btn.clicked.connect(self.on_add_clicked)
+        self.add_btn.clicked.connect(self.onAddClicked)
 
         main_layout.addWidget(self.add_btn)
 
@@ -183,6 +249,12 @@ class LabelView(QWidget):
         self.setLayout(main_layout)
 
     def refresh(self, *args):
+        """Refreshes the Label systems UI with current information
+
+        Args:
+            *args: passed information from the signals
+
+        """
         while self.container_layout.count():
             item = self.container_layout.takeAt(0)
             widget = item.widget()
@@ -191,40 +263,65 @@ class LabelView(QWidget):
 
         self.item_widgets = []
 
-        for label in self.model.get_all_labels():
+        for label in self.model.getAllLabels():
             item_widget = LabelItemWidget(label)
-            item_widget.selected.connect(self.on_label_selected)
-            item_widget.edit_requested.connect(self.on_edit_label)
-            item_widget.delete_requested.connect(self.on_delete_label)
-            item_widget.color_change_requested.connect(self.on_change_label_color)
+            item_widget.selected.connect(self.onLabelSelected)
+            item_widget.edit_requested.connect(self.onEditLabel)
+            item_widget.delete_requested.connect(self.onDeleteLabel)
+            item_widget.color_change_requested.connect(self.onChangeLabelColor)
             self.container_layout.addWidget(item_widget)
             self.item_widgets.append(item_widget)
 
-        self.update_count()
-        self.update_selection_display(self.model.get_selected_label())
+        self.updateCount()
+        self.updateSelectionDisplay(self.model.getSelectedLabel())
 
-    def update_count(self):
-        self.count_label.setText(f"Total labels: {self.model.get_label_count()}")
+    def updateCount(self):
+        """Updates the UI's representation of the amount of labels
 
-    def update_selection_display(self, selected_label):
+        """
+        self.count_label.setText(f"Total labels: {self.model.getLabelCount()}")
+
+    def updateSelectionDisplay(self, selected_label):
+        """Updates the label item widget to be selected if selected
+
+        args:
+            selected_label: the label to be selected
+
+        """
         for widget in self.item_widgets:
             widget.set_selected(widget.label == selected_label)
 
-    def on_label_selected(self, label):
-        self.model.set_selected_label(label)
+    def onLabelSelected(self, label):
+        """Receives the selected signal and sets the label as the selected label
 
-    def on_add_clicked(self):
+        args:
+            label: the label that is going to be selected
+
+        """
+        self.model.setSelectedLabel(label)
+
+    def onAddClicked(self):
+        """Adds a new label to the list and emits the labels_modified signal
+        """
         name, ok = QInputDialog.getText(
             self,
             "Add Label",
             "Enter label name:",
-            text=f"group{self.model.get_label_count() + 1}"
+            text=f"group{self.model.getLabelCount() + 1}"
         )
         if ok and name:
-            self.model.add_label(name)
+            self.model.addLabel(name)
             self.labels_modified.emit()
 
-    def on_edit_label(self, label):
+    def onEditLabel(self, label):
+        """Receives the edited signal from the edit button
+            and opens the edit dialogue to take in changes.
+            Emits the label_modified signal
+
+        args:
+            label: the label that is being edited
+
+        """
         new_name, ok = QInputDialog.getText(
             self,
             "Edit Label",
@@ -232,16 +329,32 @@ class LabelView(QWidget):
             text=label.Name
         )
         if ok and new_name:
-            self.model.update_label_name(label.Name, new_name)
+            self.model.updateLabelName(label.Name, new_name)
             self.labels_modified.emit()
 
-    def on_change_label_color(self, label):
+    def onChangeLabelColor(self, label):
+        """Receives the edited signal from the edit color button
+            and opens the color dialogue to take in changes.
+            Emits the label_modified signal
+
+        args:
+            label: the label that is being edited
+
+        """
         color = QColorDialog.getColor(label.getFillColor(), self, f"Color for {label.Name}")
         if color.isValid():
-            self.model.update_label_color(label.Name, color)
+            self.model.updateLabelColor(label.Name, color)
             self.labels_modified.emit()
 
-    def on_delete_label(self, label):
+    def onDeleteLabel(self, label):
+        """Receives the delete signal from the trash button
+            and opens the delete message to confirm
+            Emits the label_modified signal
+
+        args:
+            label: the label that is being deleted
+
+        """
         reply = QMessageBox.question(
             self,
             "Delete Label",
@@ -249,8 +362,13 @@ class LabelView(QWidget):
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
         if reply == QMessageBox.StandardButton.Yes:
-            self.model.remove_label_by_object(label)
+            self.model.removeLabelByObject(label)
             self.labels_modified.emit()
 
-    def get_model(self):
+    def getModel(self):
+        """returns the label's mode/controller
+
+        returns:
+            model: the label model objects
+        """
         return self.model

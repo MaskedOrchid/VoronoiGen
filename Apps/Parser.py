@@ -34,7 +34,7 @@ class Parser:
         self.packages = []
 
     def createLabel(self, n, c, c2):
-        lbl = Label.Label(n,QColor(c), QColor(c2))
+        lbl = Label.LABEL(n,QColor(c), QColor(c2))
         if lbl in self.labels:
             return lbl # will refactor later TO DO
         else:
