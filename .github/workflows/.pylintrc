@@ -9,3 +9,4 @@ class-naming-style=PascalCase
 variable-naming-style=any
 method-naming-style=camelCase
 argument-naming-style=any
+attr-naming-style=any
