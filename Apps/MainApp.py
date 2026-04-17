@@ -18,7 +18,7 @@ from Apps.VoronoiController import VORONOICONTROLLER
 from Apps.CanvasTools import CanvasTools
 from Apps.LabelView import LABELVIEW
 from Apps.CreationModel import CreationModel
-from Apps.CanvasOptions import CANVASOPTIONS
+from Apps.CanvasOptions import CanvasOptions
 
 
 
@@ -60,7 +60,7 @@ class MainWindow(QMainWindow):
         #Toolbar
         self.toolBar=CanvasTools(self.voroController)
         #Canvas Options
-        self.CANVASOPTIONS = CANVASOPTIONS(self.voroController)
+        self.CanvasOptions = CanvasOptions(self.voroController)
         #Parser
 
         #setting up UI and classes
@@ -106,7 +106,7 @@ class MainWindow(QMainWindow):
     def setUpVoronoi(self, cx, cy):
         """Configure the Voronoi controller and connect it to the label model."""
         self.voroController.setUpFromModel(self.model.packages, self.model.getOptions())
-        self.CANVASOPTIONS.renderText()
+        self.CanvasOptions.renderText()
 
 
     def setUpLabels(self):
@@ -145,8 +145,8 @@ class MainWindow(QMainWindow):
         tool_panel.setMinimumWidth(350)
         tool_panel.setMaximumWidth(450)
 
-        self.CANVASOPTIONS.setMinimumWidth(250)
-        self.CANVASOPTIONS.setMaximumWidth(350)
+        self.CanvasOptions.setMinimumWidth(250)
+        self.CanvasOptions.setMaximumWidth(350)
 
         left_wrapper = QVBoxLayout()
         left_wrapper.addStretch(1)
@@ -158,7 +158,7 @@ class MainWindow(QMainWindow):
 
         right_wrapper = QVBoxLayout()
         right_wrapper.addStretch(1)
-        right_wrapper.addWidget(self.CANVASOPTIONS)
+        right_wrapper.addWidget(self.CanvasOptions)
         right_wrapper.addStretch(1)
 
         right_container = QWidget()
