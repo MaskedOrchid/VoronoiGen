@@ -3,9 +3,9 @@ load-plugins=
 
 [BASIC]
 function-rgx=^[a-z]+(?:[A-Z][a-z0-9]*)*$
-class-rgx=^[A-Z_]+$
+class-rgx=^[A-Z][a-zA-Z0-9]*$
 variable-rgx=^[a-z_][a-z0-9_]*$
 
 # IMPORTANT: override naming style system
-function-naming-style= camelCase
-class-naming-style= UPPER_CASE
+function-naming-style=camelCase
+class-naming-style=PascalCase
