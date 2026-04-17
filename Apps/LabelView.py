@@ -45,11 +45,11 @@ class LabelItemWidget(QWidget):
         """
         self.label = label
         self.is_selected = False
-        self.init_ui()
-        self.update_display()
+        self.initUi()
+        self.updateDisplay()
 
 
-    def init_ui(self):
+    def initUi(self):
         """Initialize the label item widget's UI layout
         """
         layout = QHBoxLayout()
@@ -126,16 +126,16 @@ class LabelItemWidget(QWidget):
         self.selected.emit(self.label)
         super().mousePressEvent(event)
 
-    def set_selected(self, selected):
+    def setSelected(self, selected):
         """Sets the is_selected bool
 
         Args:
              selected: a bool to set is_selected too
         """
         self.is_selected = selected
-        self.apply_style()
+        self.applyStyle()
 
-    def apply_style(self):
+    def applyStyle(self):
         """Sets the label item widget to appear highlighted
 
         """
@@ -156,7 +156,7 @@ class LabelItemWidget(QWidget):
                 }
             """)
 
-    def update_display(self):
+    def updateDisplay(self):
         """Updates the UI with current label information
 
         """
@@ -289,7 +289,7 @@ class LabelView(QWidget):
 
         """
         for widget in self.item_widgets:
-            widget.set_selected(widget.label == selected_label)
+            widget.setSelected(widget.label == selected_label)
 
     def onLabelSelected(self, label):
         """Receives the selected signal and sets the label as the selected label
