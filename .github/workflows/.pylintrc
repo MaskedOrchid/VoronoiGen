@@ -1,5 +1,5 @@
 [MASTER]
-load-plugins=
+load-plugins=pylint_pyside6
 
 [BASIC]
 function-rgx=^[a-z]+(?:[A-Z][a-z0-9]*)*$
