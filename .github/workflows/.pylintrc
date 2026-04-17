@@ -1,11 +1,10 @@
 [MASTER]
+extension-pkg-whitelist=PySide6
 load-plugins=pylint_pyside6
 
 [BASIC]
-function-rgx=^[a-z]+(?:[A-Z][a-z0-9]*)*$
-class-rgx=^[A-Z][a-zA-Z0-9]*$
-variable-rgx=^[a-z_][a-z0-9_]*$
-
-# IMPORTANT: override naming style system
+# Use naming styles instead of regex patterns
 function-naming-style=camelCase
 class-naming-style=PascalCase
+variable-naming-style=camelCase
+method-naming-style=camelCase
