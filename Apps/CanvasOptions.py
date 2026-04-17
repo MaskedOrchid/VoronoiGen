@@ -1,8 +1,9 @@
 """
 CanvasOptions Module (VM-49, VM-50)
-A UI panel widget that provides controls for customizing the Voronoi canvas display.
-Handles line toggling (VM-51), line color changing (VM-52),
-line thickness changing (VM-53), and site toggling (VM-54).
+A UI panel widget that provides controls for customizing
+the Voronoi canvas display. Handles line toggling (VM-51),
+line color changing (VM-52), line thickness changing (VM-53),
+and site toggling (VM-54).
 """
 
 from PySide6.QtWidgets import (
@@ -16,10 +17,12 @@ from PySide6.QtGui import QColor
 
 class CanvasOptions(QWidget):
     """
-    A sidebar panel widget for controlling Voronoi canvas display options.
+    A sidebar panel widget for controlling Voronoi canvas
+    display options.
 
-    Provides UI controls for toggling lines/sites, changing line color,
-    and adjusting line thickness. Communicates directly with VoronoiController.
+    Provides UI controls for toggling lines/sites, changing
+    line color, and adjusting line thickness. Communicates
+    directly with VoronoiController.
     """
 
     def __init__(self, vc):
@@ -27,147 +30,197 @@ class CanvasOptions(QWidget):
         Initialize the CanvasOptions panel.
 
         Args:
-            vc: VoronoiController instance to send display commands to
+            vc: VoronoiController instance to send display
+                commands to
+
+        Returns:
+            None
         """
         super().__init__()
         self.voroController = vc
 
         # Track current toggle states
-        self.lines_on = self.voroController.getLineToggle()
-        self.sites_on = self.voroController.getSiteToggle()
+        self.linesOn = self.voroController.getLineToggle()
+        self.sitesOn = self.voroController.getSiteToggle()
 
-        self._build_ui()
+        self.buildUi()
 
-    def _build_ui(self):
-        """Construct and lay out all UI elements."""
-        main_layout = QVBoxLayout()
-        main_layout.setSpacing(14)
-        main_layout.setContentsMargins(10, 10, 10, 10)
+    def buildUi(self):
+        """
+        Construct and lay out all UI elements.
 
-        # ----- Section title -----
+        Args:
+            None
+
+        Returns:
+            None
+        """
+        mainLayout = QVBoxLayout()
+        mainLayout.setSpacing(14)
+        mainLayout.setContentsMargins(10, 10, 10, 10)
+
+        # Section title
         title = QLabel("Canvas Options")
         title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-weight: bold; font-size: 13px; color: white;")
-        main_layout.addWidget(title)
+        title.setStyleSheet(
+            "font-weight: bold; font-size: 13px; color: white;"
+        )
+        mainLayout.addWidget(title)
+        mainLayout.addWidget(self.makeDivider())
 
-        main_layout.addWidget(self._make_divider())
+        # VM-51: Line Toggle
+        lineToggleLabel = QLabel("Cell Border Lines")
+        lineToggleLabel.setStyleSheet("color: #ccc; font-size: 11px;")
+        mainLayout.addWidget(lineToggleLabel)
 
-        # ----- VM-51: Line Toggle -----
-        line_toggle_label = QLabel("Cell Border Lines")
-        line_toggle_label.setStyleSheet("color: #ccc; font-size: 11px;")
-        main_layout.addWidget(line_toggle_label)
+        self.lineToggleBtn = QPushButton()
+        self.updateLineToggleBtnText()
+        self.lineToggleBtn.setFixedHeight(36)
+        self.lineToggleBtn.clicked.connect(self.toggleLines)
+        self.lineToggleBtn.setStyleSheet(self.toggleBtnStyle())
+        mainLayout.addWidget(self.lineToggleBtn)
+        mainLayout.addWidget(self.makeDivider())
 
-        self.line_toggle_btn = QPushButton()
-        self._update_line_toggle_btn_text()
-        self.line_toggle_btn.setFixedHeight(36)
-        self.line_toggle_btn.clicked.connect(self._toggle_lines)
-        self.line_toggle_btn.setStyleSheet(self._toggle_btn_style())
-        main_layout.addWidget(self.line_toggle_btn)
+        # VM-52: Line Color
+        lineColorLabel = QLabel("Line Color")
+        lineColorLabel.setStyleSheet("color: #ccc; font-size: 11px;")
+        mainLayout.addWidget(lineColorLabel)
 
-        main_layout.addWidget(self._make_divider())
-
-        # ----- VM-52: Line Color -----
-        line_color_label = QLabel("Line Color")
-        line_color_label.setStyleSheet("color: #ccc; font-size: 11px;")
-        main_layout.addWidget(line_color_label)
-
-        color_row = QHBoxLayout()
+        colorRow = QHBoxLayout()
 
         # Color preview swatch
-        self.color_preview = QFrame()
-        self.color_preview.setFixedSize(28, 28)
-        self._update_color_preview(self.voroController.getLineColor())
-        color_row.addWidget(self.color_preview)
+        self.colorPreview = QFrame()
+        self.colorPreview.setFixedSize(28, 28)
+        self.updateColorPreview(self.voroController.getLineColor())
+        colorRow.addWidget(self.colorPreview)
 
-        self.color_btn = QPushButton("Pick Color")
-        self.color_btn.setFixedHeight(28)
-        self.color_btn.clicked.connect(self._pick_line_color)
-        self.color_btn.setStyleSheet(self._action_btn_style())
-        color_row.addWidget(self.color_btn)
+        self.colorBtn = QPushButton("Pick Color")
+        self.colorBtn.setFixedHeight(28)
+        self.colorBtn.clicked.connect(self.pickLineColor)
+        self.colorBtn.setStyleSheet(self.actionBtnStyle())
+        colorRow.addWidget(self.colorBtn)
+        mainLayout.addLayout(colorRow)
+        mainLayout.addWidget(self.makeDivider())
 
-        main_layout.addLayout(color_row)
+        # VM-53: Line Thickness
+        thicknessLabel = QLabel("Line Thickness")
+        thicknessLabel.setStyleSheet("color: #ccc; font-size: 11px;")
+        mainLayout.addWidget(thicknessLabel)
 
-        main_layout.addWidget(self._make_divider())
+        thicknessRow = QHBoxLayout()
 
-        # ----- VM-53: Line Thickness -----
-        thickness_label = QLabel("Line Thickness")
-        thickness_label.setStyleSheet("color: #ccc; font-size: 11px;")
-        main_layout.addWidget(thickness_label)
+        self.thicknessSlider = QSlider(Qt.Horizontal)
+        self.thicknessSlider.setMinimum(1)
+        self.thicknessSlider.setMaximum(20)
+        self.thicknessSlider.setValue(
+            int(self.voroController.getLineThickness())
+        )
+        self.thicknessSlider.setTickInterval(1)
+        self.thicknessSlider.valueChanged.connect(
+            self.onThicknessSliderChanged
+        )
+        thicknessRow.addWidget(self.thicknessSlider)
 
-        thickness_row = QHBoxLayout()
+        self.thicknessSpinbox = QDoubleSpinBox()
+        self.thicknessSpinbox.setMinimum(0.5)
+        self.thicknessSpinbox.setMaximum(20.0)
+        self.thicknessSpinbox.setSingleStep(0.5)
+        self.thicknessSpinbox.setDecimals(1)
+        self.thicknessSpinbox.setFixedWidth(60)
+        self.thicknessSpinbox.setValue(
+            self.voroController.getLineThickness()
+        )
+        self.thicknessSpinbox.valueChanged.connect(
+            self.onThicknessSpinboxChanged
+        )
+        thicknessRow.addWidget(self.thicknessSpinbox)
+        mainLayout.addLayout(thicknessRow)
+        mainLayout.addWidget(self.makeDivider())
 
-        self.thickness_slider = QSlider(Qt.Horizontal)
-        self.thickness_slider.setMinimum(1)
-        self.thickness_slider.setMaximum(20)
-        self.thickness_slider.setValue(int(self.voroController.getLineThickness()))
-        self.thickness_slider.setTickInterval(1)
-        self.thickness_slider.valueChanged.connect(self._on_thickness_slider_changed)
-        thickness_row.addWidget(self.thickness_slider)
+        # VM-54: Site Toggle
+        siteToggleLabel = QLabel("Site Points")
+        siteToggleLabel.setStyleSheet("color: #ccc; font-size: 11px;")
+        mainLayout.addWidget(siteToggleLabel)
 
-        self.thickness_spinbox = QDoubleSpinBox()
-        self.thickness_spinbox.setMinimum(0.5)
-        self.thickness_spinbox.setMaximum(20.0)
-        self.thickness_spinbox.setSingleStep(0.5)
-        self.thickness_spinbox.setDecimals(1)
-        self.thickness_spinbox.setFixedWidth(60)
-        self.thickness_spinbox.setValue(self.voroController.getLineThickness())
-        self.thickness_spinbox.valueChanged.connect(self._on_thickness_spinbox_changed)
-        thickness_row.addWidget(self.thickness_spinbox)
+        self.siteToggleBtn = QPushButton()
+        self.updateSiteToggleBtnText()
+        self.siteToggleBtn.setFixedHeight(36)
+        self.siteToggleBtn.clicked.connect(self.toggleSites)
+        self.siteToggleBtn.setStyleSheet(self.toggleBtnStyle())
+        mainLayout.addWidget(self.siteToggleBtn)
 
-        main_layout.addLayout(thickness_row)
-
-        main_layout.addWidget(self._make_divider())
-
-        # ----- VM-54: Site Toggle -----
-        site_toggle_label = QLabel("Site Points")
-        site_toggle_label.setStyleSheet("color: #ccc; font-size: 11px;")
-        main_layout.addWidget(site_toggle_label)
-
-        self.site_toggle_btn = QPushButton()
-        self._update_site_toggle_btn_text()
-        self.site_toggle_btn.setFixedHeight(36)
-        self.site_toggle_btn.clicked.connect(self._toggle_sites)
-        self.site_toggle_btn.setStyleSheet(self._toggle_btn_style())
-        main_layout.addWidget(self.site_toggle_btn)
-
-        main_layout.addStretch()
-        self.setLayout(main_layout)
+        mainLayout.addStretch()
+        self.setLayout(mainLayout)
 
     # ------------------------------------------------------------------ #
     #  VM-51: Line toggling
     # ------------------------------------------------------------------ #
 
-    def _toggle_lines(self):
-        """Toggle cell border line visibility on/off."""
-        self.lines_on = not self.voroController.getLineToggle()
-        self.voroController.toggleLines(self.lines_on)
-        self._update_line_toggle_btn_text()
+    def toggleLines(self):
+        """
+        Toggle cell border line visibility on/off.
 
-    def _update_line_toggle_btn_text(self):
-        """Refresh the line toggle button label to reflect current state."""
+        Args:
+            None
+
+        Returns:
+            None
+        """
+        self.linesOn = not self.voroController.getLineToggle()
+        self.voroController.toggleLines(self.linesOn)
+        self.updateLineToggleBtnText()
+
+    def updateLineToggleBtnText(self):
+        """
+        Refresh the line toggle button label to reflect
+        current state.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         if self.voroController.getLineToggle():
-            self.line_toggle_btn.setText("Lines: ON")
+            self.lineToggleBtn.setText("Lines: ON")
         else:
-            self.line_toggle_btn.setText("Lines: OFF")
+            self.lineToggleBtn.setText("Lines: OFF")
+
     # ------------------------------------------------------------------ #
     #  VM-52: Line color changing
     # ------------------------------------------------------------------ #
 
-    def _pick_line_color(self):
-        """Open a color dialog and apply the chosen color to cell borders."""
+    def pickLineColor(self):
+        """
+        Open a color dialog and apply the chosen color to
+        cell borders.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         current = self.voroController.getLineColor()
-        color = QColorDialog.getColor(current, self, "Choose Line Color")
+        color = QColorDialog.getColor(
+            current, self, "Choose Line Color"
+        )
         if color.isValid():
             self.voroController.setLineColor(color)
-            self._update_color_preview(color)
+            self.updateColorPreview(color)
 
-    def _update_color_preview(self, color: QColor):
-        """Update the small color swatch to show the current line color.
+    def updateColorPreview(self, color):
+        """
+        Update the small color swatch to show the current
+        line color.
 
         Args:
             color: QColor to display in the swatch
+
+        Returns:
+            None
         """
-        self.color_preview.setStyleSheet(
+        self.colorPreview.setStyleSheet(
             f"background-color: {color.name()};"
             "border: 1px solid #888;"
             "border-radius: 3px;"
@@ -177,28 +230,37 @@ class CanvasOptions(QWidget):
     #  VM-53: Line thickness changing
     # ------------------------------------------------------------------ #
 
-    def _on_thickness_slider_changed(self, value: int):
-        """Handle slider movement — sync spinbox and update controller.
+    def onThicknessSliderChanged(self, value):
+        """
+        Handle slider movement, sync spinbox and update
+        controller.
 
         Args:
             value: New integer slider value
+
+        Returns:
+            None
         """
-        # Block spinbox signals to avoid a feedback loop
-        self.thickness_spinbox.blockSignals(True)
-        self.thickness_spinbox.setValue(float(value))
-        self.thickness_spinbox.blockSignals(False)
+        self.thicknessSpinbox.blockSignals(True)
+        self.thicknessSpinbox.setValue(float(value))
+        self.thicknessSpinbox.blockSignals(False)
         self.voroController.setLineThickness(float(value))
         self.voroController.updateCanvas()
 
-    def _on_thickness_spinbox_changed(self, value: float):
-        """Handle spinbox change — sync slider and update controller.
+    def onThicknessSpinboxChanged(self, value):
+        """
+        Handle spinbox change, sync slider and update
+        controller.
 
         Args:
             value: New float spinbox value
+
+        Returns:
+            None
         """
-        self.thickness_slider.blockSignals(True)
-        self.thickness_slider.setValue(int(value))
-        self.thickness_slider.blockSignals(False)
+        self.thicknessSlider.blockSignals(True)
+        self.thicknessSlider.setValue(int(value))
+        self.thicknessSlider.blockSignals(False)
         self.voroController.setLineThickness(value)
         self.voroController.updateCanvas()
 
@@ -206,25 +268,60 @@ class CanvasOptions(QWidget):
     #  VM-54: Site toggling
     # ------------------------------------------------------------------ #
 
-    def _toggle_sites(self):
-        """Toggle site point visibility on/off."""
-        self.sites_on = not self.voroController.getSiteToggle()
-        self.voroController.toggleSites(self.sites_on)
-        self._update_site_toggle_btn_text()
+    def toggleSites(self):
+        """
+        Toggle site point visibility on/off.
 
-    def _update_site_toggle_btn_text(self):
-        """Refresh the site toggle button label to reflect current state."""
+        Args:
+            None
+
+        Returns:
+            None
+        """
+        self.sitesOn = not self.voroController.getSiteToggle()
+        self.voroController.toggleSites(self.sitesOn)
+        self.updateSiteToggleBtnText()
+
+    def updateSiteToggleBtnText(self):
+        """
+        Refresh the site toggle button label to reflect
+        current state.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         if self.voroController.getSiteToggle():
-            self.site_toggle_btn.setText("Sites: ON")
+            self.siteToggleBtn.setText("Sites: ON")
         else:
-            self.site_toggle_btn.setText("Sites: OFF")
+            self.siteToggleBtn.setText("Sites: OFF")
+
+    def renderText(self):
+        """
+        Re-render the toggle button text to reflect the
+        current controller state.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+        self.updateLineToggleBtnText()
+        self.updateSiteToggleBtnText()
 
     # ------------------------------------------------------------------ #
     #  Helpers
     # ------------------------------------------------------------------ #
 
-    def _make_divider(self):
-        """Create a thin horizontal divider line.
+    def makeDivider(self):
+        """
+        Create a thin horizontal divider line.
+
+        Args:
+            None
 
         Returns:
             QFrame: A styled horizontal line widget
@@ -234,7 +331,16 @@ class CanvasOptions(QWidget):
         line.setStyleSheet("color: #444;")
         return line
 
-    def _toggle_btn_style(self):
+    def toggleBtnStyle(self):
+        """
+        Return the stylesheet for toggle buttons.
+
+        Args:
+            None
+
+        Returns:
+            str: QSS stylesheet string
+        """
         return """
             QPushButton {
                 background-color: #2a2f38;
@@ -250,7 +356,16 @@ class CanvasOptions(QWidget):
             }
         """
 
-    def _action_btn_style(self):
+    def actionBtnStyle(self):
+        """
+        Return the stylesheet for action buttons.
+
+        Args:
+            None
+
+        Returns:
+            str: QSS stylesheet string
+        """
         return """
             QPushButton {
                 background-color: #1565c0;
@@ -262,6 +377,3 @@ class CanvasOptions(QWidget):
                 background-color: #1976d2;
             }
         """
-    def renderText(self):
-        self._update_line_toggle_btn_text()
-        self._update_site_toggle_btn_text()
