@@ -14,9 +14,9 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QCoreApplication
 
-from Apps.VoronoiController import VORONOICONTROLLER
+from Apps.VoronoiController import VoronoiController
 from Apps.CanvasTools import CanvasTools
-from Apps.LabelView import LABELVIEW
+from Apps.LabelView import LabelView
 from Apps.CreationModel import CreationModel
 from Apps.CanvasOptions import CanvasOptions
 
@@ -53,9 +53,9 @@ class MainWindow(QMainWindow):
         self.menu = self.menuBar()
 
         #Voronoi Controller
-        self.voroController=VORONOICONTROLLER(self.width, self.height)
+        self.voroController=VoronoiController(self.width, self.height)
         #Label Controller
-        self.label_view =LABELVIEW()
+        self.label_view =LabelView()
         self.label_model = self.label_view.getModel()
         #Toolbar
         self.toolBar=CanvasTools(self.voroController)

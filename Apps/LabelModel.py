@@ -6,10 +6,10 @@ Handles label datas, passing labels and emitting signals
 
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtGui import QColor
-from Apps.Label import LABEL
+from Apps.Label import Label
 
 
-class LABELMODEL(QObject):
+class LabelModel(QObject):
     """
         Represents the Label's internal implementation with its associated metadata.
 
@@ -40,7 +40,7 @@ class LABELMODEL(QObject):
         """
         self.labels = []
         self.selected_label = None
-        self.defaultLabel=LABEL("Default")
+        self.defaultLabel=Label("Default")
         self.defaultLabel.setSiteColor( QColor(255, 0, 0))
 
     def addLabel(self, name):
@@ -50,7 +50,7 @@ class LABELMODEL(QObject):
             name: the name of this new label
 
         """
-        new_label = LABEL(name)
+        new_label = Label(name)
         self.labels.append(new_label)
         self.label_added.emit(new_label)
 

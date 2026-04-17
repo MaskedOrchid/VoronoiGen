@@ -16,7 +16,7 @@ from shapely.creation import geometrycollections
 from VoronoiView import VORNOIVIEW
 import CellDialog
 
-class CELL:
+class Cell:
     """
     Represents a single Voronoi cell with its associated metadata.
     
@@ -68,7 +68,7 @@ class CELL:
 
 
 
-class VORONOIMODEL:
+class VoronoiModel:
     """
     Data model for Voronoi diagram.
     
@@ -94,7 +94,7 @@ class VORONOIMODEL:
         new_point = Point(newsite[0], newsite[1])
         if new_point in self.Sites:
             return False
-        self.Sites[new_point]=CELL(QPolygonF(),l)
+        self.Sites[new_point]=Cell(QPolygonF(),l)
         return True
 
     def removeSite(self, point):
@@ -221,7 +221,7 @@ class VORONOIMODEL:
                 c.setLabel(defaultL)
 
 
-class DRAWMODES(Enum):
+class DrawModes(Enum):
     """Enumeration for the different interaction modes in the Voronoi diagram.
     
     Attributes:
@@ -234,7 +234,7 @@ class DRAWMODES(Enum):
     Remove = 3
 
 
-class VORONOICONTROLLER:
+class VoronoiController:
     """
     Main controller for the Voronoi diagram application.
     
@@ -252,14 +252,14 @@ class VORONOICONTROLLER:
         # Shapely geometry collection for storing computed Voronoi polygons
         self.Voro = geometrycollections([])
         # Data model for managing sites and cells
-        self.data = VORONOIMODEL()
+        self.data = VoronoiModel()
         # Tolerance for degenerate data handling for sites being too close
         self.Tolerance = 0.001
 
         # View for rendering the diagram
         self.can = VORNOIVIEW(self, dimX, dimY)
         # Current interaction mode (Add, Remove, or Select)
-        self.mode = DRAWMODES.Add
+        self.mode = DrawModes.Add
 
         # Display settings
         self.SitesEnabled = True       # Show/hide site points
@@ -521,14 +521,14 @@ class VORONOICONTROLLER:
         Args:
             pos: [x, y] the mouse coordinates for the operation with in the Voronoi View widget
         """
-        if self.mode == DRAWMODES.Add:
+        if self.mode == DrawModes.Add:
             # Add mode: add a new site and regenerate the diagram
             if self.addSite(pos):
                 self.regenerateVoronoi()
                 self.updatePolys()
                 self.updateCanvas()
 
-        elif self.mode == DRAWMODES.Remove:
+        elif self.mode == DrawModes.Remove:
             # Remove mode: remove the site under the click position
             if self.removeSite(pos):
                 self.regenerateVoronoi()
@@ -539,7 +539,7 @@ class VORONOICONTROLLER:
                 if len(self.data.getSites()) <= 0 and self.can:
                     self.clearCanvas()
 
-        elif self.mode == DRAWMODES.Select:
+        elif self.mode == DrawModes.Select:
             # Select mode: assign cell to a label and update its colors
             site = self.data.findSiteContainPoint(pos)
             if site is not None:

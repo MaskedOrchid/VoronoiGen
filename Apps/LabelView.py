@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QFont
-from Apps.LabelModel import LABELMODEL
+from Apps.LabelModel import LabelModel
 
 
 class LabelItemWidget(QWidget):
@@ -169,7 +169,7 @@ class LabelItemWidget(QWidget):
         self.site_count.setText(f"Sites: {len(self.label.Sites)}")
 
 
-class LABELVIEW(QWidget):
+class LabelView(QWidget):
     """
         Represent Label view, handling the label systems visual view.
 
@@ -194,7 +194,7 @@ class LABELVIEW(QWidget):
 
         """
 
-        self.model = model if model else LABELMODEL()
+        self.model = model if model else LabelModel()
         self.item_widgets = []
 
         self.model.label_added.connect(self.refresh)

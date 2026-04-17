@@ -5,7 +5,7 @@ from PySide6.QtWidgets import (
     QLineEdit, QDialog, QColorDialog, QFrame, QMessageBox, QWidget
 )
 
-from Apps.Label import LABEL
+from Apps.Label import Label
 
 class Ui_CellCustomizationDialog(object):
     def setupUi(self, CellCustomizationDialog):
@@ -199,7 +199,7 @@ class CellCustomizationDialog(QDialog):
 
         label = None
         if self.selectedLabel == "(Create New Label)":
-            label = LABEL(f"group{len(self.controller.label_model.getAllLabels()) + 1}", self.fillColor, self.siteColor)
+            label = Label(f"group{len(self.controller.label_model.getAllLabels()) + 1}", self.fillColor, self.siteColor)
             self.controller.label_model.AddOldLabel(label)
         elif self.selectedLabel != "Default":
             labels = self.controller.label_model.getAllLabels()

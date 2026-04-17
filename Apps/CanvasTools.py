@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton
 
-from Apps.VoronoiController import DRAWMODES
+from Apps.VoronoiController import DrawModes
 
 
 class CanvasTools(QWidget):
@@ -14,15 +14,15 @@ class CanvasTools(QWidget):
 
         add_btn = QPushButton("Add Site")
         add_btn.setFixedHeight(40)
-        add_btn.clicked.connect(lambda: self.voroController.setMode(DRAWMODES.Add))
+        add_btn.clicked.connect(lambda: self.voroController.setMode(DrawModes.Add))
 
         remove_btn = QPushButton("Remove Site")
         remove_btn.setFixedHeight(40)
-        remove_btn.clicked.connect(lambda: self.voroController.setMode(DRAWMODES.Remove))
+        remove_btn.clicked.connect(lambda: self.voroController.setMode(DrawModes.Remove))
 
         select_btn = QPushButton("Select Cell")
         select_btn.setFixedHeight(40)
-        select_btn.clicked.connect(lambda: self.voroController.setMode(DRAWMODES.Select))
+        select_btn.clicked.connect(lambda: self.voroController.setMode(DrawModes.Select))
 
         tool_layout.addWidget(add_btn)
         tool_layout.addWidget(remove_btn)

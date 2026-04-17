@@ -7,7 +7,7 @@ sitecolor, and the amount of sites connected to this label
 from PySide6.QtGui import QColor
 
 
-class LABEL:
+class Label:
     """
         Represents a single label with its associated metadata.
 
