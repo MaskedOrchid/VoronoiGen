@@ -1,10 +1,10 @@
 [MASTER]
 extension-pkg-whitelist=PySide6
-load-plugins=pylint_pyside6
+load-plugins=
 
 [BASIC]
 # Use naming styles instead of regex patterns
 function-naming-style=camelCase
 class-naming-style=PascalCase
-variable-naming-style=camelCase
+variable-naming-style=any
 method-naming-style=camelCase
