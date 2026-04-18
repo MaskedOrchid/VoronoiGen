@@ -5,7 +5,7 @@ from PySide6.QtWidgets import (
     QLineEdit, QDialog, QColorDialog, QFrame, QMessageBox, QWidget
 )
 
-from Apps.Label import Label
+from Apps.MainApplicationClasses.Label import Label
 
 
 class Ui_CellCustomizationDialog(object):

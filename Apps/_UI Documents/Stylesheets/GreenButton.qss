@@ -1,0 +1,12 @@
+
+    QPushButton {
+        border-image: url("../_UI Documents/Images/Button1.png");
+        background-color: transparent;
+        font-family: "Vanilla Extract";
+        font-size: 16pt;
+        color: #6D9A50;
+    }
+
+    QPushButton:hover {
+       font-size: 15pt;
+    }

@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QFont
-from Apps.LabelModel import LabelModel
+from Apps.MainApplicationClasses.LabelModel import LabelModel
 
 
 class LabelItemWidget(QWidget):

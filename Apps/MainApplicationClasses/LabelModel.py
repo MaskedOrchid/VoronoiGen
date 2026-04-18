@@ -6,7 +6,7 @@ Handles label datas, passing labels and emitting signals
 
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtGui import QColor
-from Apps.Label import Label
+from Apps.MainApplicationClasses.Label import Label
 
 
 class LabelModel(QObject):
