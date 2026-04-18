@@ -22,7 +22,6 @@ class QSSGrabber:
         """
         base_dir = os.path.dirname(__file__)
         base_dir = base_dir.split("Apps")[0] + "Apps\\_UI Documents"
-        print(base_dir)
 
         match style:
             case Styles.GRAYBUTTON:
