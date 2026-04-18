@@ -1,4 +1,3 @@
-# -=-=-=-=-=-=-=-=-= IGNORE THIS -=-=-=-=-=-=-=-=-=
 
 import pandas as pd
 import re
@@ -10,25 +9,24 @@ from Apps import Label
 
 excel_set = {".xls", ".xlsx", ".xlsm", ".xlsb", ".odf", ".ods", ".odt"}
 
-"""
-    Generates the correct parser based on the provided path's file extension.
-        
-    Args:
-        filepath: name of file to be parsed
-            
-    Returns:
-        Parser: A subtype of the Parser class.
- """
-
 # xls, xlsx, xlsm, xlsb, odf, ods and odt
 
 class ParsedPackage:
+    """
+        Stores parsed data for a point.
+    """
     def __init__(self, x, y, l):
         self.xPosition = x
         self.yPosition = y
         self.label = l
 
 class Parser:
+    """
+
+        The base class for all parsers.
+        Provides label creation, an abstract parse function,
+        and a default behavior for parsing.
+    """
     def __init__(self):
         self.labels = []
         self.packages = []
@@ -44,7 +42,7 @@ class Parser:
     def parse(self, filepath : str):
         pass
 
-    def parse_behavior(self, filedata : pd.DataFrame):
+    def parseBehavior(self, filedata : pd.DataFrame):
         for i, row in filedata.iterrows():
             try:
                 x = float(row[0])
@@ -86,18 +84,37 @@ class Parser:
 
 
 class ExcelParser(Parser):
+    """
+        The parser for Excel files.
+        Includes *.xlsx, *.xls, *.xlsm, *.xlsb, *.odf, *.ods, and *.odt filetypes.
+    """
     def parse(self, filepath):
         filedata = pd.read_excel(filepath, header=None, dtype=str)
-        self.parse_behavior(filedata)
+        self.parseBehavior(filedata)
 
 
 class CsvParser(Parser):
+    """
+        The parser for *.csv files.
+    """
     def parse(self, filepath):
         filedata = pd.read_csv(filepath, header=None, dtype=str)
-        self.parse_behavior(filedata)
+        self.parseBehavior(filedata)
 
 class NoiParser(Parser):
+    """
+        The parser for *.noi files.
 
+        Params:
+            cx: the width of the canvas
+            cy: the height of the canvas
+            title: the title of the project
+            lineToggle: the line toggle setting for the canvas
+            lineColor: the color of the lines on the canvas
+            lineThickness: the line weight/thickness for the canvas
+            siteToggle: the site toggle setting for the canvas
+
+     """
     def __init__(self):
         super().__init__()
         self.cx = 0
@@ -163,6 +180,15 @@ class NoiParser(Parser):
 
 
 def create_parser(filepath : str) -> Parser:
+    """
+        Generates the correct parser based on the provided path's file extension.
+
+        Args:
+            filepath: name of file to be parsed
+
+        Returns:
+            Parser: A subtype of the Parser class.
+     """
     filename, file_extension = os.path.splitext(filepath)
 
     if file_extension == ".csv":

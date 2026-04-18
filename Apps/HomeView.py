@@ -13,6 +13,12 @@ from Apps.QSSGrabber import (QSSGrabber, Styles)
 
 
 class MainWindow(QMainWindow):
+    """
+
+        The main UI renderer for the home/startup window.
+
+    """
+
     def __init__(self, hc):
         super().__init__()
 

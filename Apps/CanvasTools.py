@@ -2,8 +2,10 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton
 
 from Apps.VoronoiController import DrawModes
 
-
 class CanvasTools(QWidget):
+    """
+    The UI implementation for adding, removing, and selecting cells.
+    """
     def __init__(self, vc):
         super().__init__()
         self.voroController=vc

@@ -13,7 +13,7 @@ from shapely import MultiPoint, Point
 from shapely import voronoi_polygons
 from shapely.creation import geometrycollections
 
-from VoronoiView import VORNOIVIEW
+from VoronoiView import VoronoiView
 import CellDialog
 
 class Cell:
@@ -257,7 +257,7 @@ class VoronoiController:
         self.Tolerance = 0.001
 
         # View for rendering the diagram
-        self.can = VORNOIVIEW(self, dimX, dimY)
+        self.can = VoronoiView(self, dimX, dimY)
         # Current interaction mode (Add, Remove, or Select)
         self.mode = DrawModes.Add
 

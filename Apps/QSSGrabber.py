@@ -8,11 +8,18 @@ class Styles(Enum):
     GRAYBUTTON = 1
 
 
-# QSSGrabber allows for pulling QSS files from the Stylesheets directory
 class QSSGrabber:
-
+    """
+        Allows for pulling QSS files from the Stylesheets directory.
+    """
     def grabStyle(self, style: Styles):
-        """Returns a stylesheet based on a given enum value.
+        """
+            Returns a stylesheet based on a given enum value.
+            Args:
+                style: An enum value from Styles
+            Returns:
+                A stylesheet string from the QSS files.
+
         """
         base_dir = os.path.dirname(__file__)
 

@@ -1,10 +1,3 @@
-"""
-CanvasOptions Module (VM-49, VM-50)
-A UI panel widget that provides controls for customizing
-the Voronoi canvas display. Handles line toggling (VM-51),
-line color changing (VM-52), line thickness changing (VM-53),
-and site toggling (VM-54).
-"""
 
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout,
@@ -102,7 +95,6 @@ class CanvasOptions(QWidget):
         mainLayout.addLayout(colorRow)
         mainLayout.addWidget(self.makeDivider())
 
-        # VM-53: Line Thickness
         thicknessLabel = QLabel("Line Thickness")
         thicknessLabel.setStyleSheet("color: #ccc; font-size: 11px;")
         mainLayout.addWidget(thicknessLabel)
@@ -152,10 +144,6 @@ class CanvasOptions(QWidget):
         mainLayout.addStretch()
         self.setLayout(mainLayout)
 
-    # ------------------------------------------------------------------ #
-    #  VM-51: Line toggling
-    # ------------------------------------------------------------------ #
-
     def toggleLines(self):
         """
         Toggle cell border line visibility on/off.
@@ -185,10 +173,6 @@ class CanvasOptions(QWidget):
             self.lineToggleBtn.setText("Lines: ON")
         else:
             self.lineToggleBtn.setText("Lines: OFF")
-
-    # ------------------------------------------------------------------ #
-    #  VM-52: Line color changing
-    # ------------------------------------------------------------------ #
 
     def pickLineColor(self):
         """
@@ -226,9 +210,6 @@ class CanvasOptions(QWidget):
             "border-radius: 3px;"
         )
 
-    # ------------------------------------------------------------------ #
-    #  VM-53: Line thickness changing
-    # ------------------------------------------------------------------ #
 
     def onThicknessSliderChanged(self, value):
         """
@@ -263,10 +244,6 @@ class CanvasOptions(QWidget):
         self.thicknessSlider.blockSignals(False)
         self.voroController.setLineThickness(value)
         self.voroController.updateCanvas()
-
-    # ------------------------------------------------------------------ #
-    #  VM-54: Site toggling
-    # ------------------------------------------------------------------ #
 
     def toggleSites(self):
         """

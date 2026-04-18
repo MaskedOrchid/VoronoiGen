@@ -204,7 +204,7 @@ class MainWindow(QMainWindow):
                 self.voroController.exportToNoi(filepath, self.windowTitle())
 
     def exportDiagram(self):
-        """Export the Voronoi diagram as an image."""
+        """Exports the Voronoi diagram as an image."""
         dialog = QFileDialog(self)
         dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
         dialog.setNameFilters([
@@ -224,7 +224,7 @@ class MainWindow(QMainWindow):
                     print(f"Failed to export diagram to: {file_path}")
 
     def clampCanvasSize(self, x, y, mx):
-        """Clamps the canvas to a currently a quick fix about
+        """Clamps the canvas, currently a temporary fix for UI issues.
 
         args:
             x: the canvas width

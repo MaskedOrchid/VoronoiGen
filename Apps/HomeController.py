@@ -4,10 +4,13 @@ from Apps import (HomeView, CreationModel, CreationView, MainApp, Parser)
 
 import sys
 
+class HomeController:
+    """
 
-# Main controller class for the home application. Handles input logic and communicates with
-# Creation and Home classes.
-class HomeController():
+    Main controller class for the home application. Handles input logic and communicates with
+    Creation and Home classes.
+
+    """
     def __init__(self):
 
         self.view = HomeView.MainWindow(self)
@@ -25,15 +28,24 @@ class HomeController():
         self.view.close()
 
     def setFile(self, value):
+        """
+            Allows files to be set in the model from UI/other classes.
+            Args:
+                value: new filepath
+        """
         if value != "":
             self.model.changeFile(value)
             return True
         return False
 
-    # Takes in input from the CreationView and updates the CreationModel accordingly
     def alterModel(self, title = "", width = "", height = ""):
-
-        #   TO DO: Implement checks for file saving
+        """
+            Takes in input from the creation view and updates the model accordingly.
+            Args:
+                title: new title for the project
+                width: new width for the project's canvas
+                height: new height for the project's canvas
+        """
         self.model.changeName(title)
         try:
             intedWidth = int(width)
@@ -48,6 +60,7 @@ class HomeController():
 
 
     def initializeMainApp(self):
+
         if self.model.file != "":
             self.parser = Parser.create_parser(self.model.file)
             self.parser.parse(self.model.file)
@@ -59,9 +72,15 @@ class HomeController():
         self.view.close()
 
     def openNoiDialog(self):
+        # called for open project.
         noi_dialog = CreationView.NoiDialog(self)
 
     def noiParser(self, filepath):
+
+        """
+            Parses the data from a *.noi file into the model.
+        """
+
         if(filepath != ""):
             self.setFile(filepath)
             self.parser = Parser.NoiParser()

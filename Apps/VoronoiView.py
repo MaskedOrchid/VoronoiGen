@@ -9,7 +9,7 @@ from PySide6.QtGui import QImage, QPainter, QPen, QBrush, QPaintEvent, QMouseEve
 from PySide6.QtWidgets import QWidget
 
 
-class VORNOIVIEW(QWidget):
+class VoronoiView(QWidget):
     """
     A custom QWidget for displaying Voronoi diagrams.
     
