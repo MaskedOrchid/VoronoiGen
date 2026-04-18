@@ -13,6 +13,7 @@ from shapely import MultiPoint, Point
 from shapely import voronoi_polygons
 from shapely.creation import geometrycollections
 
+from Apps.MainApplicationClasses import CellDialog
 from Apps.MainApplicationClasses.VoronoiView import VoronoiView
 import Apps.MainApplicationClasses.CellDialog
 
