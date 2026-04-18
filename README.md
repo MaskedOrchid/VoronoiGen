@@ -1,13 +1,7 @@
 # VoronoiGen
 ### Team Mahjong | CSCI 4440 - Software Design & Documentation
 
-VoronoiGen is a desktop application for generating and customizing interactive Voronoi diagrams. Users can create diagrams from scratch or load site data from CSV/Excel files, assign labels and colors to cells, and export the result as an image.
-
----
-
-## Design
-
-VoronoiGen is built around a **Model-View-Controller (MVC)** architecture using Python, PySide6, Shapely, and pandas. Each class has a single, clearly defined responsibility following SOLID principles. The label system uses a **Publisher-Subscriber** pattern to propagate updates across the application when label properties change.
+VoronoiGen is a desktop application for generating and customizing Voronoi diagrams. Users can create diagrams from scratch or load site data from CSV/Excel files, assign labels and colors to cells, and export the result as an image.
 
 ---
 
@@ -108,34 +102,5 @@ Each row represents a site with the following columns:
 
 ### .noi (VoronoiGen project file)
 A custom CSV-based format that stores canvas dimensions, project title, and all site data.
-
----
-
-## Project Structure
-
-```
-VoronoiGen/
-├── Apps/
-│   ├── MainApp.py            # Main application window and layout
-│   ├── HomeController.py     # Home screen controller
-│   ├── HomeView.py           # Home screen UI
-│   ├── VoronoiController.py  # Voronoi diagram logic and controller
-│   ├── VoronoiView.py        # Canvas rendering widget
-│   ├── CanvasTools.py        # Add/Remove/Select toolbar
-│   ├── CanvasOptions.py      # Line/site display options panel
-│   ├── LabelModel.py         # Label data model
-│   ├── LabelView.py          # Label manager UI
-│   ├── CellDialog.py         # Cell customization dialog
-│   ├── CreationModel.py      # New project data model
-│   ├── CreationView.py       # New project dialog UI
-│   ├── Parser.py             # CSV, Excel, and .noi file parsers
-│   ├── Label.py              # Label data class
-│   ├── FontInitialization.py # Custom font loader
-│   └── QSSGrabber.py         # QSS stylesheet loader
-├── Fonts/
-│   ├── VanillaExtractRegular.ttf
-│   └── FukuCatch.otf
-└── README.md
-```
 
 ---
