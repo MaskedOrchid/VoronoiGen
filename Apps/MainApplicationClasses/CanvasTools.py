@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QButtonGroup
 
 from Apps.MainApplicationClasses.VoronoiController import DrawModes
 
@@ -8,27 +8,56 @@ class CanvasTools(QWidget):
     """
     def __init__(self, vc):
         super().__init__()
-        self.voroController=vc
+        self.voroController = vc
 
         tool_layout = QVBoxLayout()
         tool_layout.setSpacing(15)
         tool_layout.setContentsMargins(10, 10, 10, 10)
 
-        add_btn = QPushButton("Add Site")
-        add_btn.setFixedHeight(40)
-        add_btn.clicked.connect(lambda: self.voroController.setMode(DrawModes.Add))
+        self.button_group = QButtonGroup(self)
+        self.button_group.setExclusive(True)
+        self.button_modes = {}
 
-        remove_btn = QPushButton("Remove Site")
-        remove_btn.setFixedHeight(40)
-        remove_btn.clicked.connect(lambda: self.voroController.setMode(DrawModes.Remove))
+        self.add_btn = self._createModeButton("Add Site", DrawModes.Add)
+        self.remove_btn = self._createModeButton("Remove Site", DrawModes.Remove)
+        self.select_btn = self._createModeButton("Select Cell", DrawModes.Select)
 
-        select_btn = QPushButton("Select Cell")
-        select_btn.setFixedHeight(40)
-        select_btn.clicked.connect(lambda: self.voroController.setMode(DrawModes.Select))
-
-        tool_layout.addWidget(add_btn)
-        tool_layout.addWidget(remove_btn)
-        tool_layout.addWidget(select_btn)
+        tool_layout.addWidget(self.add_btn)
+        tool_layout.addWidget(self.remove_btn)
+        tool_layout.addWidget(self.select_btn)
 
         self.setLayout(tool_layout)
+        self._applyStyles()
+        self.setActiveMode(self.voroController.getMode())
 
+    def _createModeButton(self, text, mode):
+        btn = QPushButton(text)
+        btn.setFixedHeight(40)
+        btn.setCheckable(True)
+        btn.clicked.connect(lambda checked, m=mode: self.setActiveMode(m))
+        self.button_group.addButton(btn)
+        self.button_modes[btn] = mode
+        return btn
+
+    def setActiveMode(self, mode):
+        self.voroController.setMode(mode)
+        for button, button_mode in self.button_modes.items():
+            button.setChecked(button_mode == mode)
+
+    def _applyStyles(self):
+        self.setStyleSheet(
+            """
+            QPushButton {
+                border: 1px solid #a0a0a0;
+                border-radius: 6px;
+                padding: 8px;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                border-color: #1976d2;
+            }
+            QPushButton:checked {
+                border: 2px solid #1976d2;
+            }
+            """
+        )
