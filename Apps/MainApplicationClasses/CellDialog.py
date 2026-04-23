@@ -1,10 +1,13 @@
+import os
+
 from PySide6.QtCore import (QCoreApplication, QMetaObject, QRect, Qt)
-from PySide6.QtGui import (QFont, QColor)
+from PySide6.QtGui import (QFont, QColor, QLinearGradient, QPalette, QBrush, QDoubleValidator)
 from PySide6.QtWidgets import (
     QDialogButtonBox, QLabel, QComboBox, QPushButton,
-    QLineEdit, QDialog, QColorDialog, QFrame, QMessageBox, QWidget
+    QLineEdit, QDialog, QColorDialog, QFrame, QMessageBox, QWidget, QSizePolicy, QVBoxLayout, QHBoxLayout
 )
 
+from Apps.HelperClasses.FontInitialization import FontInitialization
 from Apps.MainApplicationClasses.Label import Label
 
 
@@ -18,64 +21,192 @@ class Ui_CellCustomizationDialog(object):
     def setupUi(self, CellCustomizationDialog):
         if not CellCustomizationDialog.objectName():
             CellCustomizationDialog.setObjectName(u"CellCustomizationDialog")
-        CellCustomizationDialog.resize(400, 260)
+        CellCustomizationDialog.resize(395, 300)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        CellCustomizationDialog.setSizePolicy(sizePolicy)
+        CellCustomizationDialog.setFixedSize(395, 300)
+
+        self.fi = FontInitialization()
 
         self.buttonBox = QDialogButtonBox(CellCustomizationDialog)
         self.buttonBox.setObjectName(u"buttonBox")
-        self.buttonBox.setGeometry(QRect(30, 220, 341, 32))
+        self.buttonBox.setGeometry(QRect(30, 240, 341, 32))
         self.buttonBox.setOrientation(Qt.Horizontal)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
 
         self.label = QLabel(CellCustomizationDialog)
         self.label.setObjectName(u"label")
-        self.label.setGeometry(QRect(20, 10, 354, 38))
+        #self.label.setGeometry(QRect(20, 10, 354, 38))
         font = QFont()
         font.setFamilies([u"Fuku Catch"])
         font.setPointSize(20)
         self.label.setFont(font)
         self.label.setAlignment(Qt.AlignCenter)
+        self.label.setStyleSheet("color: #80A7D0;")
+
+        current_directory = os.path.dirname(os.path.realpath(__file__))
+        temp_dir = current_directory.split("Apps")[0] + "Apps\\_UI Documents"
+        file = os.path.join(temp_dir, "Images/dialogue_border.png")
+        file = file.replace("\\", "/")
+
+        gradient = QLinearGradient(0, 0, 0, 400)
+        gradient.setColorAt(0.0, QColor(210, 228, 239))
+        gradient.setColorAt(1.0, QColor(102, 155, 198))
+
+        palette = CellCustomizationDialog.palette()
+        palette.setBrush(QPalette.ColorRole.Window, QBrush(gradient))
+        CellCustomizationDialog.setPalette(palette)
+
+        CellCustomizationDialog.setAutoFillBackground(True)
+
+        CellCustomizationDialog.setStyleSheet(f"""
+                QDialog {{
+                    border-image: url("{file}") 0 0 0 0 stretch stretch;
+                }}
+                QComboBox {{
+                    color: #2E4D68;
+                    background-color: #6790B4; 
+                    font-family: "Merge";
+                    padding-left: 3px;
+                }}
+                QComboBox:hover {{
+                    color: #324F7D;
+                    background-color: #80A7D0;
+                }}
+                QLineEdit {{
+                    background-color: rgba(255, 255, 255, 50);
+                    color: #80A7D0;
+                    selection-color: white;
+                    selection-background-color: #5073A9;
+                    border: 1px solid #80A7D0;
+                    border-radius: 4px;
+                    padding: 4px;
+                }}
+                QLineEdit:focus {{
+                    color: #324F7D;
+                    border: 1px solid #5073A9;
+                    background-color: #80A7D0;
+                }}
+                QPushButton {{
+                    color: #2E4D68;
+                    background-color: #6790B4;
+                    font-family: "Vanilla Extract";
+                    font-size: 10;
+                }}
+                QPushButton:hover {{
+                    color: #5073A9;
+                    background-color: #80A7D0;
+                }}
+                """)
+
+        self.mainLayout = QVBoxLayout(CellCustomizationDialog)
+        self.mainLayout.setContentsMargins(20, 20, 20, 20)
+        self.mainLayout.setSpacing(12)
+
+        self.mainLayout.addSpacing(10)
+        self.mainLayout.addWidget(self.label, alignment=Qt.AlignCenter)
+        self.mainLayout.addSpacing(10)
 
         # -=-=-=-=-=-=-=- label dropdown -=-=-=-=-=-=-=-
         self.dropdown = QComboBox(CellCustomizationDialog)
         self.dropdown.setObjectName(u"dropdown")
         self.dropdown.setGeometry(QRect(100, 60, 200, 25))
 
+        dropdownLayout = QHBoxLayout()
+        dropdownLayout.addStretch()
+        dropdownLayout.addWidget(self.dropdown)
+        dropdownLayout.addStretch()
+
+        self.mainLayout.addLayout(dropdownLayout)
+        self.mainLayout.addSpacing(5)
+
+
         # -=-=-=-=-=-=-=- cell color button and label -=-=-=-=-=-=-=-
         self.cellColorLabel = QLabel(CellCustomizationDialog)
         self.cellColorLabel.setObjectName(u"cellColorLabel")
         self.cellColorLabel.setGeometry(QRect(40, 100, 120, 25))
+        self.cellColorLabel.setFixedWidth(100)
+        self.cellColorLabel.setStyleSheet("color: #5073A9; font-weight: bold; font-family: Merge")
+
 
         self.cellColorFrame = QFrame(CellCustomizationDialog)
         self.cellColorFrame.setObjectName(u"cellColorFrame")
-        self.cellColorFrame.setGeometry(QRect(180, 100, 40, 25))
-        self.cellColorFrame.setStyleSheet("background-color: white; border: 1px solid black;")
+        #self.cellColorFrame.setGeometry(QRect(180, 100, 40, 25))
+        self.cellColorFrame.setStyleSheet("background-color: white; border: 1px solid #80A7D0;")
+        self.cellColorFrame.setFixedSize(40, 18)
 
+        cellLayout = QHBoxLayout()
+        cellLayout.addStretch(1)
+        cellLayout.addWidget(self.cellColorLabel)
+        cellLayout.addWidget(self.cellColorFrame)
+        cellLayout.addStretch(1)
+
+
+        self.mainLayout.addLayout(cellLayout)
         # -=-=-=-=-=-=-=- site color button stuff -=-=-=-=-=-=-=-
         self.siteColorLabel = QLabel(CellCustomizationDialog)
         self.siteColorLabel.setObjectName(u"siteColorLabel")
         self.siteColorLabel.setGeometry(QRect(40, 130, 120, 25))
+        self.siteColorLabel.setFixedWidth(100)
+        self.siteColorLabel.setStyleSheet("color: #5073A9; font-weight: bold; font-family: Merge")
+
 
         self.siteColorFrame = QFrame(CellCustomizationDialog)
         self.siteColorFrame.setObjectName(u"siteColorFrame")
-        self.siteColorFrame.setGeometry(QRect(180, 130, 40, 25))
-        self.siteColorFrame.setStyleSheet("background-color: white; border: 1px solid black;")
+        #self.siteColorFrame.setGeometry(QRect(180, 130, 40, 25))
+        self.siteColorFrame.setStyleSheet("background-color: white; border: 1px solid #80A7D0;")
+        self.siteColorFrame.setFixedSize(40, 18)
 
+        siteLayout = QHBoxLayout()
+        siteLayout.addStretch(1)
+        siteLayout.addWidget(self.siteColorLabel)
+        siteLayout.addWidget(self.siteColorFrame)
+        siteLayout.addStretch(1)
+
+        self.mainLayout.addLayout(siteLayout)
         # -=-=-=-=-=-=-=- site location stuff -=-=-=-=-=-=-=-
         self.xLabel = QLabel(CellCustomizationDialog)
         self.xLabel.setObjectName(u"xLabel")
         self.xLabel.setGeometry(QRect(80, 170, 20, 25))
+        self.xLabel.setFixedWidth(10)
+        self.xLabel.setStyleSheet("color: #5073A9; font-weight: bold; font-family: Merge")
 
         self.xInput = QLineEdit(CellCustomizationDialog)
         self.xInput.setObjectName(u"xInput")
         self.xInput.setGeometry(QRect(100, 170, 60, 25))
+        self.xInput.setFixedWidth(60)
 
         self.yLabel = QLabel(CellCustomizationDialog)
         self.yLabel.setObjectName(u"yLabel")
         self.yLabel.setGeometry(QRect(200, 170, 20, 25))
+        self.yLabel.setFixedWidth(10)
+        self.yLabel.setStyleSheet("color: #5073A9; font-weight: bold; font-family: Merge")
+
 
         self.yInput = QLineEdit(CellCustomizationDialog)
         self.yInput.setObjectName(u"yInput")
         self.yInput.setGeometry(QRect(220, 170, 60, 25))
+        self.yInput.setFixedWidth(60)
+
+
+        posLayout = QHBoxLayout()
+
+        posLayout.addSpacing(25)
+        posLayout.addWidget(self.xLabel)
+        posLayout.addSpacing(-50)
+        posLayout.addWidget(self.xInput)
+
+        posLayout.addWidget(self.yLabel)
+        posLayout.addSpacing(-50)
+        posLayout.addWidget(self.yInput)
+        posLayout.addSpacing(25)
+
+        self.mainLayout.addSpacing(5)
+        self.mainLayout.addLayout(posLayout)
+
+        self.mainLayout.addStretch()
+        self.mainLayout.addWidget(self.buttonBox, alignment=Qt.AlignRight)
+        self.mainLayout.addSpacing(15)
 
         self.retranslateUi(CellCustomizationDialog)
 
@@ -126,6 +257,12 @@ class CellCustomizationDialog(QDialog):
 
         self.ui = Ui_CellCustomizationDialog()
         self.ui.setupUi(self)
+        validator = QDoubleValidator()
+        validator.setDecimals(1)
+        validator.setNotation(QDoubleValidator.StandardNotation)
+
+        self.ui.xInput.setValidator(validator)
+        self.ui.yInput.setValidator(validator)
 
         self.ui.cellColorFrame.mousePressEvent = self.changeCellColor
         self.ui.siteColorFrame.mousePressEvent = self.changeSiteColor
@@ -145,8 +282,8 @@ class CellCustomizationDialog(QDialog):
         self.xPos = self.site.x
         self.yPos = self.site.y
 
-        self.ui.xInput.setText(str(self.xPos))
-        self.ui.yInput.setText(str(self.yPos))
+        self.ui.xInput.setText(str(f"{self.xPos:.1f}"))
+        self.ui.yInput.setText(str(f"{self.yPos:.1f}"))
 
         label = self.poly.getLabel()
         if label:

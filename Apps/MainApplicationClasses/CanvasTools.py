@@ -48,16 +48,12 @@ class CanvasTools(QWidget):
         self.setStyleSheet(
             """
             QPushButton {
-                border: 1px solid #a0a0a0;
                 border-radius: 6px;
                 padding: 8px;
                 font-size: 14px;
             }
-            QPushButton:hover {
-                border-color: #1976d2;
-            }
             QPushButton:checked {
-                border: 2px solid #1976d2;
+                border: 3px solid #319D5E;
             }
             """
         )

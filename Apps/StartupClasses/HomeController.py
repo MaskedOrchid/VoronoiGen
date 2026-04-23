@@ -103,5 +103,7 @@ class HomeController:
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     hc = HomeController()
+    if len(sys.argv) > 1:
+        hc.noiParser(sys.argv[1])
     sys.exit(app.exec())
 

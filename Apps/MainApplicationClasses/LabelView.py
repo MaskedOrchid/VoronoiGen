@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
     QInputDialog, QMessageBox,
 )
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QFont
+from PySide6.QtGui import QFont, QLinearGradient, QColor, QPalette, QBrush
 from Apps.MainApplicationClasses.LabelModel import LabelModel
 
 
@@ -64,15 +64,15 @@ class LabelItemWidget(QWidget):
 
         # Name
         self.name_label = QLabel()
-        self.name_label.setMinimumWidth(30)
-        self.name_label.setMaximumWidth(60)
-        self.name_label.setStyleSheet("font-weight: 500;")
+        self.name_label.setMinimumWidth(50)
+        self.name_label.setMaximumWidth(50)
+        self.name_label.setStyleSheet("""font-family: "Merge"; font-weight: 500;""")
         layout.addWidget(self.name_label)
 
         # Sites
         self.site_count = QLabel()
-        self.site_count.setStyleSheet("color: #888; font-size: 10px;")
-        layout.addWidget(self.site_count)
+        self.site_count.setStyleSheet("""color: #888; font-family: "Merge"; font-size: 10px;""")
+        # layout.addWidget(self.site_count)
 
         layout.addStretch()
 
@@ -81,11 +81,12 @@ class LabelItemWidget(QWidget):
             QPushButton {
                 padding: 4px 8px;
                 border-radius: 5px;
-                background-color: #2a2f38;
-                color: white;
+                background-color: #62A77E;
+                color: #3E634D;
+                border-color: transparent;
             }
             QPushButton:hover {
-                background-color: #3a3f48;
+                background-color: #85D5A6;
             }
         """
 
@@ -106,6 +107,7 @@ class LabelItemWidget(QWidget):
                 color: white;
                 border-radius: 5px;
                 padding: 4px 8px;
+                border-color: transparent;
             }
             QPushButton:hover {
                 background-color: #e53935;
@@ -143,7 +145,7 @@ class LabelItemWidget(QWidget):
             self.setStyleSheet("""
                 QWidget {
                     background-color: #2c3440;
-                    border: 2px solid #4CAF50;
+                    border: 2px solid yellow;
                     border-radius: 6px;
                 }
             """)
@@ -197,6 +199,8 @@ class LabelView(QWidget):
         self.model = model if model else LabelModel()
         self.item_widgets = []
 
+        self.ipd = QInputDialog()
+
         self.model.label_added.connect(self.refresh)
         self.model.label_removed.connect(self.refresh)
         self.model.label_updated.connect(self.refresh)
@@ -213,17 +217,67 @@ class LabelView(QWidget):
         main_layout.setContentsMargins(12, 12, 12, 12)
         main_layout.setSpacing(12)
 
+        self.ipd = QInputDialog(self)
+        self.ipd.setWindowTitle("Add Label")
+        self.ipd.setLabelText("Enter label name:")
+        self.ipd.setTextValue(f"group{self.model.getLabelCount() + 1}")
+        self.ipd.setStyleSheet(f"""
+        QInputDialog{{
+            background-color: #9DC0D4;
+        }}
+        QLabel{{
+            font-family: Merge;
+            font-weight: bold;
+            color: #5073A9;
+        }}
+        QLineEdit {{
+            background-color: rgba(255, 255, 255, 50);
+            color: #80A7D0;
+            selection-color: white;
+            selection-background-color: #5073A9;
+            border: 1px solid #80A7D0;
+            border-radius: 4px;
+            padding: 4px;
+        }}
+        QLineEdit:focus {{
+            color: #324F7D;
+            border: 1px solid #5073A9;
+            background-color: #80A7D0;
+        }}
+        QPushButton {{
+            color: #2E4D68;
+            background-color: #6790B4;
+            font-family: "Vanilla Extract";
+            font-size: 8;
+        }}
+        QPushButton:hover {{
+            color: #5073A9;
+            background-color: #80A7D0;
+        }}
+        """)
+
+        gradient = QLinearGradient(0, 0, 0, 400)
+        gradient.setColorAt(0.0, QColor(176, 218, 182))
+        gradient.setColorAt(1.0, QColor(126, 172, 133))
+
+        palette = self.palette()
+        palette.setBrush(QPalette.ColorRole.Window, QBrush(gradient))
+        self.setPalette(palette)
+
+        self.setAutoFillBackground(True)
+
+
         # Add button (top)
         self.add_btn = QPushButton("+ Add Label")
         self.add_btn.setFixedHeight(36)
         self.add_btn.setStyleSheet("""
             QPushButton {
-                background-color: #2e7d32;
+                background-color: #5D9A75;
                 color: white;
                 border-radius: 6px;
             }
             QPushButton:hover {
-                background-color: #388e3c;
+                background-color: #8BB49B;
             }
         """)
         self.add_btn.clicked.connect(self.onAddClicked)
@@ -242,7 +296,7 @@ class LabelView(QWidget):
         # Footer count
         self.count_label = QLabel()
         self.count_label.setAlignment(Qt.AlignCenter)
-        self.count_label.setStyleSheet("color: #aaa; font-size: 11px;")
+        self.count_label.setStyleSheet("color: #406841; font-size: 11px;")
 
         main_layout.addWidget(self.count_label)
 
@@ -303,12 +357,9 @@ class LabelView(QWidget):
     def onAddClicked(self):
         """Adds a new label to the list and emits the labels_modified signal
         """
-        name, ok = QInputDialog.getText(
-            self,
-            "Add Label",
-            "Enter label name:",
-            text=f"group{self.model.getLabelCount() + 1}"
-        )
+        self.ipd.setTextValue(f"group{self.model.getLabelCount() + 1}")
+        ok = self.ipd.exec()
+        name = self.ipd.textValue() if ok else ""
         if ok and name:
             self.model.addLabel(name)
             self.labels_modified.emit()
@@ -322,14 +373,11 @@ class LabelView(QWidget):
             label: the label that is being edited
 
         """
-        new_name, ok = QInputDialog.getText(
-            self,
-            "Edit Label",
-            "Enter new label name:",
-            text=label.Name
-        )
-        if ok and new_name:
-            self.model.updateLabelName(label.Name, new_name)
+        self.ipd.setTextValue(f"{label.getName()}")
+        ok = self.ipd.exec()
+        name = self.ipd.textValue() if ok else ""
+        if ok and name:
+            self.model.updateLabelName(label.Name, name)
             self.labels_modified.emit()
 
     def onChangeLabelColor(self, label):

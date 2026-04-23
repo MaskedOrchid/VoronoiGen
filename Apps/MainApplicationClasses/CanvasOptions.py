@@ -56,14 +56,14 @@ class CanvasOptions(QWidget):
         title = QLabel("Canvas Options")
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet(
-            "font-weight: bold; font-size: 13px; color: white;"
+            """font-weight: bold; font-size: 25px; font-family: "Vanilla Extract"; color: #6D9A50;"""
         )
         mainLayout.addWidget(title)
         mainLayout.addWidget(self.makeDivider())
 
         # VM-51: Line Toggle
         lineToggleLabel = QLabel("Cell Border Lines")
-        lineToggleLabel.setStyleSheet("color: #ccc; font-size: 11px;")
+        lineToggleLabel.setStyleSheet("""font-family: "Vanilla Extract"; color: #6D9A50; font-size: 11px;""")
         mainLayout.addWidget(lineToggleLabel)
 
         self.lineToggleBtn = QPushButton()
@@ -76,7 +76,7 @@ class CanvasOptions(QWidget):
 
         # VM-52: Line Color
         lineColorLabel = QLabel("Line Color")
-        lineColorLabel.setStyleSheet("color: #ccc; font-size: 11px;")
+        lineColorLabel.setStyleSheet("""font-family: "Vanilla Extract"; color: #6D9A50; font-size: 11px;""")
         mainLayout.addWidget(lineColorLabel)
 
         colorRow = QHBoxLayout()
@@ -96,7 +96,7 @@ class CanvasOptions(QWidget):
         mainLayout.addWidget(self.makeDivider())
 
         thicknessLabel = QLabel("Line Thickness")
-        thicknessLabel.setStyleSheet("color: #ccc; font-size: 11px;")
+        thicknessLabel.setStyleSheet("""font-family: "Vanilla Extract"; color: #6D9A50; font-size: 11px;""")
         mainLayout.addWidget(thicknessLabel)
 
         thicknessRow = QHBoxLayout()
@@ -111,6 +111,31 @@ class CanvasOptions(QWidget):
         self.thicknessSlider.valueChanged.connect(
             self.onThicknessSliderChanged
         )
+        self.thicknessSlider.setFixedWidth(150)
+        self.thicknessSlider.setStyleSheet("""
+            QSlider::groove:horizontal {
+            background: #6D9A50;
+            height: 6px;
+            border-radius: 3px;
+        }
+        
+        QSlider::sub-page:horizontal {
+            background: #6D9A50;
+            border-radius: 3px;
+        }
+        
+        QSlider::add-page:horizontal {
+            background: #3F453C;
+            border-radius: 3px;
+        }
+        
+        QSlider::handle:horizontal {
+            background: #FFFFFF;
+            width: 14px;
+            margin: -5px 0;
+            border-radius: 7px;
+        }
+        """)
         thicknessRow.addWidget(self.thicknessSlider)
 
         self.thicknessSpinbox = QDoubleSpinBox()
@@ -118,10 +143,14 @@ class CanvasOptions(QWidget):
         self.thicknessSpinbox.setMaximum(20.0)
         self.thicknessSpinbox.setSingleStep(0.5)
         self.thicknessSpinbox.setDecimals(1)
-        self.thicknessSpinbox.setFixedWidth(60)
+        self.thicknessSpinbox.setFixedWidth(80)
         self.thicknessSpinbox.setValue(
             self.voroController.getLineThickness()
         )
+        self.thicknessSpinbox.setStyleSheet("""
+            color: #6D9A50;
+            background-color: #BBE7A9;
+        """)
         self.thicknessSpinbox.valueChanged.connect(
             self.onThicknessSpinboxChanged
         )
@@ -131,7 +160,7 @@ class CanvasOptions(QWidget):
 
         # VM-54: Site Toggle
         siteToggleLabel = QLabel("Site Points")
-        siteToggleLabel.setStyleSheet("color: #ccc; font-size: 11px;")
+        siteToggleLabel.setStyleSheet("""font-family: "Vanilla Extract"; color: #6D9A50; font-size: 11px;""")
         mainLayout.addWidget(siteToggleLabel)
 
         self.siteToggleBtn = QPushButton()
@@ -305,7 +334,7 @@ class CanvasOptions(QWidget):
         """
         line = QFrame()
         line.setFrameShape(QFrame.HLine)
-        line.setStyleSheet("color: #444;")
+        line.setStyleSheet("color: #6D9A50;")
         return line
 
     def toggleBtnStyle(self):
@@ -320,16 +349,13 @@ class CanvasOptions(QWidget):
         """
         return """
             QPushButton {
-                background-color: #2a2f38;
+                background-color: #5D9A75;
                 color: white;
                 border-radius: 6px;
                 font-size: 12px;
             }
             QPushButton:hover {
-                background-color: #3a3f48;
-            }
-            QPushButton:pressed {
-                background-color: #1a1f28;
+                background-color: #8BB49B;
             }
         """
 
@@ -345,12 +371,12 @@ class CanvasOptions(QWidget):
         """
         return """
             QPushButton {
-                background-color: #1565c0;
+                background-color: #5D9A75;
                 color: white;
                 border-radius: 5px;
                 padding: 4px 10px;
             }
             QPushButton:hover {
-                background-color: #1976d2;
+                background-color: #8BB49B;
             }
         """
