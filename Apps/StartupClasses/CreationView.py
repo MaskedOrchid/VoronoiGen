@@ -20,6 +20,8 @@ from PySide6.QtWidgets import (QAbstractButton, QApplication, QDialog, QDialogBu
     QSizePolicy, QSpacerItem, QVBoxLayout, QWidget, QFileDialog)
 
 import os
+
+from Apps.HelperClasses.FontInitialization import FontInitialization
 from Apps.StartupClasses import HomeController
 
 class Ui_CreationView(object):
@@ -40,6 +42,7 @@ class Ui_CreationView(object):
         sizePolicy.setHeightForWidth(CreationView.sizePolicy().hasHeightForWidth())
         CreationView.setSizePolicy(sizePolicy)
         CreationView.setMaximumSize(QSize(400, 300))
+        self.fi = FontInitialization
         font = QFont()
         font.setFamilies([u"Merge"])
         CreationView.setFont(font)
@@ -55,15 +58,62 @@ class Ui_CreationView(object):
         self.verticalLayoutWidget.setGeometry(QRect(20, 10, 356, 211))
         self.verticalLayout = QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout.setContentsMargins(0, 15, 0, 0)
         self.label = QLabel(self.verticalLayoutWidget)
         self.label.setObjectName(u"label")
         font1 = QFont()
         font1.setFamilies([u"Fuku Catch"])
         font1.setPointSize(20)
         font1.setBold(False)
+
+        self.label.setStyleSheet("color: #80A7D0;")
         self.label.setFont(font1)
         self.label.setAlignment(Qt.AlignCenter)
+
+        gradient = QLinearGradient(0, 0, 0, 400)
+        gradient.setColorAt(0.0, QColor(210, 228, 239))
+        gradient.setColorAt(1.0, QColor(102, 155, 198))
+
+        palette = CreationView.palette()
+        palette.setBrush(QPalette.ColorRole.Window, QBrush(gradient))
+        CreationView.setPalette(palette)
+
+        CreationView.setAutoFillBackground(True)
+
+        current_directory = os.path.dirname(os.path.realpath(__file__))
+        temp_dir = current_directory.split("Apps")[0] + "Apps\\_UI Documents"
+        file = os.path.join(temp_dir, "Images/dialogue_border.png")
+        file = file.replace("\\", "/")
+
+        CreationView.setStyleSheet(f"""
+        QDialog {{
+            border-image: url("{file}") 0 0 0 0 stretch stretch;
+        }}
+        QLineEdit {{
+            background-color: rgba(255, 255, 255, 50);
+            color: #80A7D0;
+            selection-color: white;
+            selection-background-color: #5073A9;
+            border: 1px solid #80A7D0;
+            border-radius: 4px;
+            padding: 4px;
+        }}
+        QLineEdit:focus {{
+            color: #324F7D;
+            border: 1px solid #5073A9;
+            background-color: #80A7D0;
+        }}
+        QPushButton {{
+            color: #2E4D68;
+            background-color: #6790B4;
+            font-family: "Vanilla Extract";
+            font-size: 8;
+        }}
+        QPushButton:hover {{
+            color: #5073A9;
+            background-color: #80A7D0;
+        }}
+        """)
 
         self.verticalLayout.addWidget(self.label)
 
@@ -83,6 +133,7 @@ class Ui_CreationView(object):
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.horizontalLayout.addStretch(1)
         self.pushButton = QPushButton(self.verticalLayoutWidget)
         self.pushButton.setObjectName(u"pushButton")
 
@@ -101,8 +152,10 @@ class Ui_CreationView(object):
         sizePolicy1.setHeightForWidth(self.label_3.sizePolicy().hasHeightForWidth())
         self.label_3.setSizePolicy(sizePolicy1)
         self.label_3.setAlignment(Qt.AlignCenter)
+        self.label_3.setStyleSheet("color: #5073A9; font-weight: bold;")
 
         self.horizontalLayout.addWidget(self.label_3)
+        self.horizontalLayout.addStretch(1)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout)
@@ -121,7 +174,9 @@ class Ui_CreationView(object):
         font2.setPointSize(10)
         font2.setBold(False)
         font2.setItalic(True)
+
         self.label_9.setFont(font2)
+        self.label_9.setStyleSheet("color: #5073A9; font-weight: bold;")
 
         self.horizontalLayout_12.addWidget(self.label_9)
 
@@ -146,6 +201,7 @@ class Ui_CreationView(object):
         self.label_2 = QLabel(self.verticalLayoutWidget)
         self.label_2.setObjectName(u"label_2")
         self.label_2.setFont(font2)
+        self.label_2.setStyleSheet("color: #5073A9; font-weight: bold;")
 
         self.horizontalLayout_5.addWidget(self.label_2)
 

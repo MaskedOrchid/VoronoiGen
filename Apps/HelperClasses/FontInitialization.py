@@ -11,6 +11,8 @@ class FontInitialization:
     def __init__(self):
         self.loadFonts("Fonts\\VanillaExtractRegular.ttf")
         self.loadFonts("Fonts\\FukuCatch.otf")
+        self.loadFonts("Fonts\\merge_light.otf")
+
 
     def loadFonts(self, fp):
         """
@@ -22,5 +24,4 @@ class FontInitialization:
         current_directory = os.path.dirname(os.path.realpath(__file__))
         new_dir = current_directory.split("Apps")[0] + "Apps\\_UI Documents"
         file = os.path.join(new_dir, fp)
-        print(file)
         QFontDatabase.addApplicationFont(file.__str__())

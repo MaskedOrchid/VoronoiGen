@@ -31,6 +31,5 @@ class QSSGrabber:
             case _:
                 return None
 
-        image_path = image_path.replace("\\", "/")
         with open(image_path, "r") as fh:
             return fh.read()

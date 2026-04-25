@@ -744,7 +744,7 @@ class VoronoiController:
             """
         with open(filepath, 'w', encoding='utf-8') as f:
             f.write("canvas_x,canvas_y,name,line_toggle,line_color,line_weight,site_toggle\n")
-            f.write(f"{self.getCanvas.getCanvasSize()[0]},{self.getCanvas.getCanvasSize()[0]},{window},"
+            f.write(f"{self.getCanvas.getCanvasSize()[0]},{self.getCanvas.getCanvasSize()[1]},{window},"
                     f"{int(self.getLineToggle())},{self.getLineColor().name()},{self.getLineThickness()},"
                     f"{int(self.getSiteToggle())}\n")
             f.write("x-coordinate,y-coordinate,label title,cell color\n")

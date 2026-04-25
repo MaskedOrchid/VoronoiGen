@@ -3,10 +3,10 @@ MainApp Module
 Main application window for the Voronoi Diagram Generator.
 Manages the UI layout, menu bar, and coordinates between the controller and views.
 """
+import os
+import sys
 
-
-
-from PySide6.QtGui import QAction
+from PySide6.QtGui import QAction, QLinearGradient, QColor, QPalette, QBrush
 from PySide6.QtWidgets import (
     QMainWindow, QWidget,
     QHBoxLayout, QVBoxLayout,
@@ -19,7 +19,7 @@ from Apps.MainApplicationClasses.CanvasTools import CanvasTools
 from Apps.MainApplicationClasses.LabelView import LabelView
 from Apps.StartupClasses.CreationModel import CreationModel
 from Apps.MainApplicationClasses.CanvasOptions import CanvasOptions
-
+from Apps.StartupClasses import HomeController
 
 
 class MainWindow(QMainWindow):
@@ -65,6 +65,35 @@ class MainWindow(QMainWindow):
 
         #setting up UI and classes
 
+        gradient = QLinearGradient(0, 0, 0, 1000)
+        gradient.setColorAt(0.0, QColor(250, 250, 250))
+        gradient.setColorAt(1.0, QColor(172, 209, 165))
+
+        palette = self.palette()
+        palette.setBrush(QPalette.ColorRole.Window, QBrush(gradient))
+        self.setPalette(palette)
+
+        self.setAutoFillBackground(True)
+        current_directory = os.path.dirname(os.path.realpath(__file__))
+
+        temp_dir = current_directory.split("Apps")[0] + "Apps\\_UI Documents"
+        file = os.path.join(temp_dir, "Images/cb.png")
+        file = file.replace("\\", "/")
+
+        self.setStyleSheet(f"""
+               QMainWindow {{
+                   border-image: url("{file}") 0 0 0 0 stretch stretch;
+               }}
+               QPushButton {{
+                    color: #6D9A50;
+                    background-color: #BAE7A9;
+                    font-family: "Vanilla Extract";
+               }}
+               QPushButton:hover {{
+                    background-color: #ABD888;
+               }}
+        """)
+
         self.setUpMenuBar()
         self.setUpLabels()
         self.setUpVoronoi(self.width, self.height)
@@ -72,11 +101,26 @@ class MainWindow(QMainWindow):
         self.setUpLayouts()
 
     def setUpMenuBar(self):
+
+        self.menu.setFixedHeight(10)
+        self.menu.setStyleSheet("""
+            QMenuBar {
+                background-color: rgba(93, 154, 117, 25);
+                color: #5D9A75;
+            }
+            QMenuBar::item {
+                background-color: transparent;
+            }
+            QMenuBar::item:selected {
+                background-color: rgba(93, 154, 117, 25);
+            }
+        """)
+
         """Create and configure the menu bar with File menu options."""
         # Create File menu actions
-       # new_action = QAction("New Project", self)
-       # new_action.setStatusTip("This creates a new Project")
-       # new_action.triggered.connect(self.newProject)
+        new_action = QAction("Return Home", self)
+        new_action.setStatusTip("This returns the program to the home menu.")
+        new_action.triggered.connect(self.newProject)
 
        # open_action = QAction("Open Project", self)
        # open_action.setStatusTip("This Opens a Project")
@@ -86,7 +130,7 @@ class MainWindow(QMainWindow):
         save_action.setStatusTip("This saves the current Project")
         save_action.triggered.connect(self.saveProject)
 
-        export_action = QAction("Export Diagram", self)
+        export_action = QAction("Export As Image", self)
         export_action.setStatusTip("This exports the Voronoi Diagram as an image")
         export_action.triggered.connect(self.exportDiagram)
 
@@ -96,10 +140,10 @@ class MainWindow(QMainWindow):
 
         # Add actions to File menu
         file_menu = self.menu.addMenu("&File")
-       # file_menu.addAction(new_action)
        # file_menu.addAction(open_action)
         file_menu.addAction(save_action)
         file_menu.addAction(export_action)
+        file_menu.addAction(new_action)
         file_menu.addAction(quit_action)
 
 
@@ -132,6 +176,7 @@ class MainWindow(QMainWindow):
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.label_view)
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll.setWidgetResizable(True)
         scroll.setMinimumHeight(400)
 
 
@@ -169,10 +214,10 @@ class MainWindow(QMainWindow):
         main_layout.setContentsMargins(10, 10, 10, 10)
 
         content_layout = QHBoxLayout()
-        content_layout.setSpacing(30)
+        content_layout.setSpacing(18)
 
         content_layout.addWidget(left_container)
-        content_layout.addWidget(self.voroController.getCanvas, 1)  # canvas expands
+        content_layout.addWidget(self.voroController.getCanvas)  # canvas expands
         content_layout.addWidget(right_container)
 
         main_layout.addStretch(1)
@@ -185,7 +230,8 @@ class MainWindow(QMainWindow):
 
     def newProject(self):
         """Create a new project (placeholder)."""
-        print("Create new Project")
+        self.close()
+        self.home = HomeController.HomeController()
 
     def openProject(self):
         """Open an existing project (placeholder)."""

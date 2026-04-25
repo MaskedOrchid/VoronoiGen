@@ -62,19 +62,51 @@ class MainWindow(QMainWindow):
         # -=-=-=- Create new project button -=-=-=-
         self.createButton = QPushButton('Create New Project')
         self.createButton.setFixedSize(300, 70)
-        self.createButton.setStyleSheet(self.grabber.grabStyle(Styles.GREENBUTTON))
+        file = os.path.join(temp_dir, "Images/Button1.png")
+        file = file.replace("\\", "/")
+        style = f"""
+        QPushButton {{
+            border-image: url("{file}");
+            background-color: transparent;
+            font-family: "Vanilla Extract";
+            padding: 10px;
+            font-size: 16pt;
+            color: #6D9A50;
+        }}
+        
+        QPushButton:hover {{
+            font-size: 15pt;
+        }}
+        """
+        self.createButton.setStyleSheet(style)
         self.createButton.clicked.connect(self.homeController.open_dialog)
 
         # -=-=-=- Open project button -=-=-=-
         self.openButton = QPushButton('Open Project')
         self.openButton.setFixedSize(300, 70)
-        self.openButton.setStyleSheet(self.grabber.grabStyle(Styles.GREENBUTTON))
+        self.openButton.setStyleSheet(style)
         self.openButton.clicked.connect(self.homeController.openNoiDialog)
 
         # -=-=-=- Exit Program Button -=-=-=-
         self.exitButton = QPushButton('Exit')
         self.exitButton.setFixedSize(QSize(160, 40))
-        self.exitButton.setStyleSheet(self.grabber.grabStyle(Styles.GRAYBUTTON))
+        file = os.path.join(temp_dir, "Images/Button2.png")
+        file = file.replace("\\", "/")
+        style = f"""
+        QPushButton {{
+            border-image: url("{file}");
+            background-color: transparent;
+            font-family: "Vanilla Extract";
+            padding: 10px;
+            font-size: 14pt;
+            color: #8D8D8D;
+        }}
+
+        QPushButton:hover {{
+            font-size: 13pt;
+        }}
+        """
+        self.exitButton.setStyleSheet(style)
         self.exitButton.clicked.connect(self.homeController.exit_app)
 
         # Setup window layout
