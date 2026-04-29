@@ -22,32 +22,7 @@ VoronoiGen is a desktop application for generating and customizing Voronoi diagr
 - PySide6
 - Shapely
 - Pandas
-
----
-
-## Installation
-
-**1. Clone the repository**
-```bash
-git clone https://github.com/MaskedOrchid/VoronoiGen.git
-cd VoronoiGen
-```
-
-**2. Install dependencies**
-```bash
-python -m pip install PySide6 shapely pandas
-```
-
----
-
-## Running the App
-
-From the project root (`VoronoiGen/` folder):
-
-```bash
-python -m Apps.HomeController
-```
-
+  
 ---
 
 ## Usage
